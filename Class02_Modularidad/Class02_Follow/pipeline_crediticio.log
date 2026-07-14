@@ -1,0 +1,26 @@
+20:54:36 | __main__             | INFO | === INICIO PIPELINE RIESGO CREDITICIO BANCO WIESSE ===
+20:54:36 | data_loader          | INFO | Cargando datos desde data/df.csv
+20:54:36 | data_loader          | INFO | Dataset cargado: 150000 filas x 12 columnas
+20:54:36 | data_loader          | INFO | Distribucion Default: {0: 139974, 1: 10026}
+20:54:36 | preprocessing        | INFO | Mto_ingreso_mensual: 0 valores NA-string convertidos a NaN
+20:54:36 | preprocessing        | INFO | Nro_dependiente: 0 valores NA-string convertidos a NaN
+20:54:36 | preprocessing        | INFO | Prct_uso_tc: 3338 outliers tratados [0.00, 1.00]
+20:54:36 | preprocessing        | INFO | Prct_deuda_vs_ingresos: 14993 outliers tratados [0.00, 2449.00]
+20:54:36 | preprocessing        | INFO | Mto_ingreso_mensual: 12013 outliers tratados [1300.00, 14587.60]
+20:54:36 | preprocessing        | INFO | Mto_ingreso_mensual: 29731 nulos imputados con median (5400.0000)
+20:54:36 | preprocessing        | INFO | Nro_dependiente: 3924 nulos imputados con mode (0.0000)
+20:54:36 | features             | INFO | Score_retrasos: min=0.0 max=980.0
+20:54:36 | features             | INFO | Edad_cat: {'45-55': 36690, '55-65': 33406, '35-45': 29819, '>65': 28586, '25-35': 18458, '<25': 3028}
+20:54:36 | features             | INFO | Top 15 features: ['Prct_uso_tc', 'Prct_uso_tc_std', 'Nro_prestao_retrasados', 'Nro_prestao_retrasados_std', 'Score_retrasos']
+20:54:36 | preprocessing        | INFO | Split: train=120000 test=30000
+20:54:36 | preprocessing        | INFO | Balanceo smote: antes=120000 despues=223958
+20:55:44 | train                | INFO | [Regresion Logistica] Recall=0.5032 | F1=0.2729 | ROC-AUC=0.7596
+20:55:53 | train                | INFO | [Random Forest] Recall=0.5017 | F1=0.4144 | ROC-AUC=0.8505
+20:57:12 | train                | INFO | [Gradient Boosting] Recall=0.3830 | F1=0.3911 | ROC-AUC=0.8455
+20:57:12 | train                | INFO | Mejor modelo: Random Forest (F1=0.4144)
+20:57:12 | __main__             | INFO | === RESULTADOS FINALES ===
+20:57:12 | __main__             | INFO | Regresion Logistica: F1=0.2729 Recall=0.5032 AUC=0.7596
+20:57:12 | __main__             | INFO | Random Forest: F1=0.4144 Recall=0.5017 AUC=0.8505
+20:57:12 | __main__             | INFO | Gradient Boosting: F1=0.3911 Recall=0.3830 AUC=0.8455
+20:57:12 | __main__             | INFO | Mejor modelo: Random Forest | FN=999 | FP=1844
+20:57:12 | __main__             | INFO | === PIPELINE COMPLETADO ===

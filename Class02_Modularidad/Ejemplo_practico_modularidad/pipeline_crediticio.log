@@ -1,0 +1,52 @@
+03:02:16 | __main__             | INFO | === INICIO PIPELINE RIESGO CREDITICIO BANCO WIESSE ===
+03:02:16 | data_loader          | INFO | Cargando datos desde data/df.csv
+03:02:16 | data_loader          | INFO | Dataset cargado: 150000 filas x 12 columnas
+03:02:16 | data_loader          | INFO | Distribucion Default: {0: 139974, 1: 10026}
+03:02:16 | preprocessing        | INFO | Mto_ingreso_mensual: 0 valores NA-string convertidos a NaN
+03:02:16 | preprocessing        | INFO | Nro_dependiente: 0 valores NA-string convertidos a NaN
+03:02:16 | preprocessing        | INFO | Prct_uso_tc: 3338 outliers tratados [0.00, 1.00]
+03:02:16 | preprocessing        | INFO | Prct_deuda_vs_ingresos: 14993 outliers tratados [0.00, 2449.00]
+03:02:16 | preprocessing        | INFO | Mto_ingreso_mensual: 12013 outliers tratados [1300.00, 14587.60]
+03:02:16 | preprocessing        | INFO | Mto_ingreso_mensual: 29731 nulos imputados con median (5400.0000)
+03:02:16 | preprocessing        | INFO | Nro_dependiente: 3924 nulos imputados con mode (0.0000)
+03:02:16 | features             | INFO | Score_retrasos: min=0.0 max=980.0
+03:02:16 | features             | INFO | Edad_cat: {'45-55': 36690, '55-65': 33406, '35-45': 29819, '>65': 28586, '25-35': 18458, '<25': 3028}
+00:18:10 | __main__             | INFO | === INICIO PIPELINE RIESGO CREDITICIO BANCO WIESSE ===
+00:18:10 | data_loader          | INFO | Cargando datos desde data/df.csv
+00:18:11 | data_loader          | INFO | Dataset cargado: 150000 filas x 12 columnas
+00:18:11 | data_loader          | INFO | Distribucion Default: {0: 139974, 1: 10026}
+00:18:11 | preprocessing        | INFO | Mto_ingreso_mensual: 0 valores NA-string convertidos a NaN
+00:18:11 | preprocessing        | INFO | Nro_dependiente: 0 valores NA-string convertidos a NaN
+00:18:11 | preprocessing        | INFO | Prct_uso_tc: 3338 outliers tratados [0.00, 1.00]
+00:18:11 | preprocessing        | INFO | Prct_deuda_vs_ingresos: 14993 outliers tratados [0.00, 2449.00]
+00:18:11 | preprocessing        | INFO | Mto_ingreso_mensual: 12013 outliers tratados [1300.00, 14587.60]
+00:18:11 | preprocessing        | INFO | Mto_ingreso_mensual: 29731 nulos imputados con median (5400.0000)
+00:18:11 | preprocessing        | INFO | Nro_dependiente: 3924 nulos imputados con mode (0.0000)
+00:18:11 | features             | INFO | Score_retrasos: min=0.0 max=980.0
+00:18:11 | features             | INFO | Edad_cat: {'45-55': 36690, '55-65': 33406, '35-45': 29819, '>65': 28586, '25-35': 18458, '<25': 3028}
+00:21:44 | __main__             | INFO | === INICIO PIPELINE RIESGO CREDITICIO BANCO WIESSE ===
+00:21:44 | data_loader          | INFO | Cargando datos desde data/df.csv
+00:21:44 | data_loader          | INFO | Dataset cargado: 150000 filas x 12 columnas
+00:21:44 | data_loader          | INFO | Distribucion Default: {0: 139974, 1: 10026}
+00:21:45 | preprocessing        | INFO | Mto_ingreso_mensual: 0 valores NA-string convertidos a NaN
+00:21:45 | preprocessing        | INFO | Nro_dependiente: 0 valores NA-string convertidos a NaN
+00:21:45 | preprocessing        | INFO | Prct_uso_tc: 3338 outliers tratados [0.00, 1.00]
+00:21:45 | preprocessing        | INFO | Prct_deuda_vs_ingresos: 14993 outliers tratados [0.00, 2449.00]
+00:21:45 | preprocessing        | INFO | Mto_ingreso_mensual: 12013 outliers tratados [1300.00, 14587.60]
+00:21:45 | preprocessing        | INFO | Mto_ingreso_mensual: 29731 nulos imputados con median (5400.0000)
+00:21:45 | preprocessing        | INFO | Nro_dependiente: 3924 nulos imputados con mode (0.0000)
+00:21:45 | features             | INFO | Score_retrasos: min=0.0 max=980.0
+00:21:45 | features             | INFO | Edad_cat: {'45-55': 36690, '55-65': 33406, '35-45': 29819, '>65': 28586, '25-35': 18458, '<25': 3028}
+00:21:45 | features             | INFO | Top 15 features: ['Prct_uso_tc', 'Prct_uso_tc_std', 'Nro_prestao_retrasados', 'Nro_prestao_retrasados_std', 'Score_retrasos']
+00:21:45 | preprocessing        | INFO | Split: train=120000 test=30000
+00:21:45 | preprocessing        | INFO | Balanceo smote: antes=120000 despues=223958
+00:22:14 | train                | INFO | [Regresion Logistica] Recall=0.5232 | F1=0.2839 | ROC-AUC=0.771
+00:22:33 | train                | INFO | [Random Forest] Recall=0.5177 | F1=0.4149 | ROC-AUC=0.8517
+00:24:28 | train                | INFO | [Gradient Boosting] Recall=0.3845 | F1=0.3922 | ROC-AUC=0.8454
+00:24:28 | train                | INFO | Mejor modelo: Random Forest (F1=0.4149)
+00:24:28 | __main__             | INFO | === RESULTADOS FINALES ===
+00:24:28 | __main__             | INFO | Regresion Logistica: F1=0.2839 Recall=0.5232 AUC=0.771
+00:24:28 | __main__             | INFO | Random Forest: F1=0.4149 Recall=0.5177 AUC=0.8517
+00:24:28 | __main__             | INFO | Gradient Boosting: F1=0.3922 Recall=0.3845 AUC=0.8454
+00:24:28 | __main__             | INFO | Mejor modelo: Random Forest | FN=967 | FP=1961
+00:24:28 | __main__             | INFO | === PIPELINE COMPLETADO ===
