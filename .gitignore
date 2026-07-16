@@ -30,3 +30,8 @@ __pycache__/
 # Archivos de logs del sistema
 *.log
 
+
+# Ignorar dataset
+/data/Dataset Endeudamiento Crediticio.csv
+
+
