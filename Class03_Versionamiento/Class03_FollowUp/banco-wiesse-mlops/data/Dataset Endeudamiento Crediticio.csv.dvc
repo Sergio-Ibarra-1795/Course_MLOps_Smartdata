@@ -1,0 +1,5 @@
+outs:
+- md5: ffae8c49bfa8318c7fcf6fd0dfbf0aca
+  size: 81281
+  hash: md5
+  path: Dataset Endeudamiento Crediticio.csv
