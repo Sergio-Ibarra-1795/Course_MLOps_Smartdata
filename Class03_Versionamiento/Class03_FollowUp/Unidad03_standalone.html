@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<!-- plantilla_unidad.html v3 — HTML con aspecto de documento (igual al PDF) -->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLOPS Caso Práctico 03 — Versionamiento de Datos y Modelos</title>
+<style>
+/* ============================================================
+   estilos.css — Plantilla maestra HTML v3 ("documento")
+   Curso: MLOps con GitHub Codespaces y Google Cloud Platform
+   El HTML replica el aspecto del PDF aprobado: hoja blanca con
+   encabezado/pie de documento, tarjetas con borde fino, código
+   oscuro estilo GitHub y botones Copiar (solo en HTML).
+   ============================================================ */
+:root {
+  --dark: #1A1A2E; --accent: #E94560; --blue: #0F3460;
+  --light-blue: #16213E; --code-bg: #0D1117;
+  --gray: #6C757D; --light-gray: #F8F9FA; --border: #DEE2E6;
+  --warn-bg: #FFF3CD; --warn-border: #E0A800;
+  --info-bg: #E8F4F8; --info-border: #17A2B8;
+  --green-bg: #D4EDDA; --green-border: #28A745;
+  --danger-bg: #F8D7DA; --danger-border: #DC3545;
+  --tech-bg: #FDEBD9; --tech-border: #E8833A;
+  --btn-bg: #21262D; --btn-text: #58A6FF;
+  --code-text: #E6EDF3; --code-cmt: #8B949E;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       background: #DADFE5; color: #212529; line-height: 1.55;
+       padding: 26px 12px 60px; }
+
+/* ---------- Hoja de documento (aspecto del PDF) ---------- */
+.hoja { background: #fff; max-width: 900px; margin: 0 auto;
+        box-shadow: 0 3px 22px rgba(0,0,0,.22); border-radius: 3px;
+        padding: 26px 34px 30px; }
+
+/* Encabezado corrido del documento (igual al PDF) */
+.doc-header { display: flex; justify-content: space-between; align-items: baseline;
+              gap: 10px; flex-wrap: wrap; padding-bottom: 8px; margin-bottom: 18px;
+              border-bottom: 1px solid var(--border); }
+.doc-header .brand { font-weight: 700; font-size: 13px; color: var(--dark); }
+.doc-header .sub { font-size: 12px; color: var(--gray); }
+.doc-header a { font-size: 12px; color: var(--blue); text-decoration: none; }
+.doc-header a:hover { color: var(--accent); }
+
+/* Pie del documento (igual al PDF) */
+.doc-footer { display: flex; justify-content: space-between; gap: 10px;
+              flex-wrap: wrap; margin-top: 22px; padding-top: 8px;
+              border-top: 1px solid var(--border);
+              font-size: 12px; color: var(--gray); }
+
+/* ---------- Portada (idéntica al PDF) ---------- */
+.cover { border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+         margin-bottom: 20px; }
+.cover-accent { height: 6px; background: var(--accent); }
+.cover-body { padding: 26px 30px; }
+.cover-badge { display: inline-block; background: var(--dark); color: #fff;
+               font-size: 11px; font-weight: 700; padding: 6px 16px;
+               border-radius: 6px; letter-spacing: 1px; margin-bottom: 14px; }
+.cover-sub { font-size: 14px; color: var(--blue); margin-bottom: 6px; }
+.cover-title { font-size: 25px; font-weight: 800; color: var(--dark);
+               line-height: 1.28; margin-bottom: 8px; }
+.cover-cs { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.pill { background: var(--dark); border-radius: 8px; padding: 8px 14px;
+        text-align: center; flex: 1; min-width: 128px; }
+.pill-label { font-size: 9px; font-weight: 700; color: #AAAACC;
+              letter-spacing: 1px; text-transform: uppercase; }
+.pill-val { font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px; }
+
+/* ---------- Tarjetas (borde fino, como en el PDF) ---------- */
+.card { border: 1px solid var(--border); border-radius: 9px; overflow: hidden;
+        margin-bottom: 16px; }
+.sec-header { background: var(--blue); color: #fff; padding: 9px 15px;
+              font-weight: 700; font-size: 14px; }
+.card-body { padding: 14px 18px 6px; }
+
+/* Paso */
+.step { background: var(--blue); }
+.step-row { display: flex; align-items: center; }
+.step-badge { background: rgba(0,0,0,0.28); color: #fff; font-weight: 800;
+              font-size: 11px; padding: 9px 15px; text-align: center;
+              min-width: 66px; text-transform: uppercase; line-height: 1.15; }
+.step-badge span { display: block; font-size: 18px; }
+.step-title { color: #fff; font-weight: 700; font-size: 15px; padding: 0 15px; }
+.step-label { margin-left: auto; background: rgba(0,0,0,0.22); color: #E6EDF3;
+              font-size: 10px; padding: 4px 12px; font-family: monospace; }
+
+/* ---------- Código oscuro con botón Copiar ---------- */
+.code-wrap { margin: 9px 0 15px; }
+.code-header { display: flex; align-items: center; justify-content: space-between;
+               background: #161b22; border-radius: 8px 8px 0 0;
+               padding: 6px 12px; border-bottom: 1px solid #30363d; }
+.code-lang { font-size: 11px; color: #8B949E; font-family: monospace; }
+.copy-btn { background: var(--btn-bg); color: var(--btn-text); border: 1px solid #30363d;
+            border-radius: 6px; font-size: 11px; font-weight: 600; padding: 4px 12px;
+            cursor: pointer; transition: all 0.15s; display: flex;
+            align-items: center; gap: 5px; }
+.copy-btn:hover { background: #30363d; border-color: var(--btn-text); }
+.copy-btn.copied { color: #3fb950; border-color: #3fb950; }
+.copy-btn svg { width: 13px; height: 13px; fill: currentColor; }
+pre.codigo { background: var(--code-bg); color: var(--code-text);
+      font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+      font-size: 12.5px; line-height: 1.6; padding: 13px 15px; margin: 0;
+      border-radius: 0 0 8px 8px; overflow-x: auto; white-space: pre; }
+
+/* Resaltado Pygments — tema oscuro GitHub (mismo que el PDF) */
+.codigo .c,.codigo .c1,.codigo .cm,.codigo .ch,.codigo .cs{color:#8B949E;font-style:italic}
+.codigo .k,.codigo .kn,.codigo .kd,.codigo .ow,.codigo .kc{color:#FF7B72}
+.codigo .s,.codigo .s1,.codigo .s2,.codigo .sd,.codigo .sb{color:#A5D6FF}
+.codigo .nf,.codigo .fm{color:#D2A8FF}
+.codigo .nc{color:#F2CC60}
+.codigo .nb,.codigo .bp,.codigo .m,.codigo .mi,.codigo .mf,.codigo .l{color:#79C0FF}
+.codigo .o{color:#FF7B72}
+.codigo .nd{color:#D2A8FF}
+.codigo .nt{color:#7EE787}
+.codigo .gp{color:#8B949E}
+
+/* ---------- Cajas ---------- */
+.box { border-radius: 8px; padding: 11px 15px; margin: 9px 0;
+       font-size: 13.5px; line-height: 1.5; }
+.box-info { background: var(--info-bg); border-left: 4px solid var(--info-border); }
+.box-warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); }
+.box-success { background: var(--green-bg); border-left: 4px solid var(--green-border); }
+.box-danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); }
+.box-tech { background: var(--tech-bg); border-left: 4px solid var(--tech-border); }
+
+/* ---------- Tablas ---------- */
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; margin: 9px 0 15px; }
+table.t th { background: var(--blue); color: #fff; padding: 8px 12px;
+             text-align: left; font-size: 12px; }
+table.t td { padding: 7px 12px; border-bottom: 1px solid var(--border);
+             vertical-align: top; }
+table.t tr:nth-child(even) td { background: var(--light-gray); }
+table.t.mod-table th { background: var(--light-blue); }
+table.t code, table.t th code { font-family: monospace; font-size: 12px; }
+
+/* ---------- Objetivos / aprendizajes ---------- */
+.objectives { list-style: none; padding: 0; margin-bottom: 8px; }
+.objectives li { padding: 5px 0 5px 24px; position: relative; font-size: 14px; }
+.objectives li::before { content: '●'; color: var(--accent); position: absolute; left: 0; }
+.learning { margin-bottom: 13px; padding-left: 16px; }
+.learning-title { font-weight: 700; color: var(--blue); font-size: 14px; margin-bottom: 3px; }
+.learning-desc { font-size: 13.5px; color: #444; }
+
+/* ---------- Árbol y checklist ---------- */
+pre.arbol { background: var(--code-bg); color: var(--code-text);
+            font-family: 'Fira Code', Consolas, monospace; font-size: 12px;
+            line-height: 1.55; padding: 13px 15px; border-radius: 8px;
+            overflow-x: auto; margin: 9px 0 15px; white-space: pre; }
+ul.checklist { list-style: none; padding: 0; margin-bottom: 8px; }
+ul.checklist li { padding: 6px 0 6px 28px; position: relative; font-size: 14px; }
+ul.checklist li::before { content: ""; position: absolute; left: 0; top: 9px;
+  width: 15px; height: 15px; border: 2px solid var(--blue); border-radius: 4px; }
+
+p { font-size: 14px; margin-bottom: 10px; }
+code { font-family: monospace; font-size: 12.5px; background: #f1f3f5;
+       padding: 1px 5px; border-radius: 3px; }
+ul, ol { padding-left: 22px; margin-bottom: 10px; font-size: 14px; }
+li { margin: 3px 0; }
+strong { color: var(--dark); }
+
+/* ---------- Navegación entre unidades (dentro de la hoja) ---------- */
+.nav-unidades { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.nav-unidades a { flex: 1; border: 1px solid var(--border); border-radius: 9px;
+  padding: 11px 15px; text-decoration: none; color: var(--dark); font-size: 13px;
+  transition: all .15s; }
+.nav-unidades a:hover { border-color: var(--accent); }
+.nav-unidades .rot { display: block; font-size: 10px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+.nav-unidades .sig { text-align: right; }
+
+/* ---------- Índice general ---------- */
+.grid-unidades { display: grid; grid-template-columns: repeat(auto-fill,minmax(270px,1fr));
+                 gap: 14px; margin: 4px 0 18px; }
+.u-card { border: 1px solid var(--border); border-radius: 9px; padding: 15px;
+          transition: all .15s; }
+.u-card:hover { border-color: var(--accent); }
+.u-num { color: var(--accent); font-weight: 800; font-size: 11px; letter-spacing: 1.5px; }
+.u-card h3 { font-size: 15px; color: var(--dark); margin: 5px 0 6px; }
+.u-card p { font-size: 12.5px; color: var(--gray); }
+.u-card .links a { margin-right: 10px; font-size: 12.5px; font-weight: 700;
+                   color: var(--blue); text-decoration: none; }
+.u-card .links a:hover { color: var(--accent); }
+
+@media (max-width: 640px) {
+  body { padding: 10px 4px 40px; }
+  .hoja { padding: 16px 14px 20px; }
+  .pills { flex-direction: column; }
+  .pill { min-width: unset; }
+  pre.codigo, pre.arbol { font-size: 11px; }
+  .step-title { font-size: 13px; }
+  .cover-title { font-size: 20px; }
+}
+@media print {
+  body { background: #fff; padding: 0; }
+  .hoja { box-shadow: none; max-width: none; }
+  .copy-btn { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="hoja">
+
+  <!-- Encabezado del documento (igual al PDF) -->
+  <div class="doc-header">
+    <span class="brand">CURSO DE MLOPS — Tema 3</span>
+    <span class="sub">Caso Práctico 03 · Predicción Default · Codespaces</span>
+    <a href="index.html">Índice del curso →</a>
+  </div>
+
+  <!-- Portada -->
+  <div class="cover">
+    <div class="cover-accent"></div>
+    <div class="cover-body">
+      <div class="cover-badge">CURSO DE MLOPS</div>
+      <div class="cover-sub">Tema 3 — Versionamiento de Datos y Modelos</div>
+      <div class="cover-title">Caso Práctico: DVC + MLflow — Banco Wiesse</div>
+      <div class="cover-cs">Adaptado para GitHub Codespaces</div>
+      <div class="pills">
+        <div class="pill"><div class="pill-label">Nivel</div><div class="pill-val">Introductorio</div></div>
+        <div class="pill"><div class="pill-label">Proyecto</div><div class="pill-val">Predicción Default</div></div>
+        <div class="pill"><div class="pill-label">Entorno</div><div class="pill-val">GitHub Codespaces</div></div>
+        <div class="pill"><div class="pill-label">Duración</div><div class="pill-val">90 – 120 min</div></div>
+      </div>
+      <div class="box box-info"><strong>■ Todo el laboratorio se ejecuta desde la terminal integrada del Codespace</strong> (Ctrl+` para abrirla). No necesitas instalar nada en tu máquina local. Los botones <strong>Copiar</strong> de cada bloque de código funcionan en todos los navegadores.</div>
+    </div>
+  </div>
+
+  <div class="card"><div class="sec-header">¿Qué estamos haciendo y por qué?</div><div class="card-body"><p>En el Tema 2 refactorizamos el notebook en módulos limpios. El problema que queda: cada vez que cambias un parámetro, el dataset o el umbral de SMOTE, obtienes un modelo distinto y no hay forma de saber cuál lo generó ni de reproducirlo.</p><div class="box box-warn"><strong>■ El problema:</strong> sin herramientas de tracking, es imposible saber qué experimento generó el mejor modelo ni con qué versión del dataset se entrenó.</div><p>Agregamos <strong>DVC</strong> para versionar el dataset y <strong>MLflow</strong> para registrar cada experimento. Al final compararemos varias versiones del modelo con métricas reales.</p></div></div><div class="card"><div class="sec-header">¿Qué lograrás al final?</div><div class="card-body"><ul class="objectives"><li>Entender qué es DVC y por qué los datasets no van en Git</li><li>Inicializar DVC y versionar el CSV del proyecto</li><li>Instalar y configurar MLflow para tracking de experimentos</li><li>Registrar parámetros, métricas y el modelo entrenado como artefacto</li><li>Ejecutar varias versiones del pipeline con parámetros distintos</li><li>Comparar versiones en la UI de MLflow y por código con <code>comparar_runs.py</code></li></ul></div></div><div class="card"><div class="sec-header">Conceptos clave antes de empezar</div><div class="card-body"><p><strong>DVC — Data Version Control:</strong> Git versiona código pero no archivos grandes (CSV, modelos .pkl). DVC usa archivos <code>.dvc</code> como punteros ligeros que SÍ van en Git, con el hash MD5 del dataset real.</p><p><strong>MLflow — Tracking de Experimentos:</strong> cada ejecución del pipeline es un <em>Run</em> dentro de un <em>Experiment</em>. Registra parámetros, métricas y artefactos (modelo .pkl).</p><div class="box box-info">La diferencia clave: <strong>DVC</strong> responde «¿con qué datos se entrenó este modelo?». <strong>MLflow</strong> responde «¿cuáles son los resultados de cada experimento?». Son complementarios.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>1</span></div><div class="step-title">Inicializar DVC en el proyecto</div><div class="step-label">Terminal</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+
+<span class="c1"># 1. Inicializar DVC (requiere que Git ya esté inicializado)</span>
+dvc<span class="w"> </span>init
+<span class="c1"># Initialized DVC repository.</span>
+
+<span class="c1"># 2. Ver qué archivos creó DVC</span>
+git<span class="w"> </span>status
+<span class="c1"># new file: .dvc/.gitignore</span>
+<span class="c1"># new file: .dvc/config</span>
+<span class="c1"># new file: .dvcignore</span>
+
+<span class="c1"># 3. Commitear la inicialización</span>
+git<span class="w"> </span>add<span class="w"> </span>.dvc<span class="w"> </span>.dvcignore
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;init: inicializar DVC en el proyecto&quot;</span>
+git<span class="w"> </span>push
+</pre></div><div class="box box-info">■ En Codespaces el push funciona directamente — el token de GitHub ya está configurado. Si pide credenciales, usa <code>gh auth login</code>.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>2</span></div><div class="step-title">Versionar el dataset con DVC</div><div class="step-label">data/df.csv</div></div></div><div class="card-body"><p>El CSV no debe ir en Git. Con <code>dvc add</code> creamos el puntero <code>.dvc</code> que SÍ va en Git:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">dvc<span class="w"> </span>add<span class="w"> </span>data/df.csv
+<span class="c1"># To track the changes with git, run:</span>
+<span class="c1"># git add data/df.csv.dvc data/.gitignore</span>
+
+cat<span class="w"> </span>data/df.csv.dvc
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">yaml — data/df.csv.dvc</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nt">outs</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">md5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6f93a05ad020724c9510887f81f2e9e2</span>
+<span class="w">  </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7979980</span>
+<span class="w">  </span><span class="nt">hash</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">md5</span>
+<span class="w">  </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">df.csv</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">git<span class="w"> </span>add<span class="w"> </span>data/df.csv.dvc<span class="w"> </span>data/.gitignore
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;data: versionar dataset crediticio con DVC v1.0&quot;</span>
+git<span class="w"> </span>push
+</pre></div><table class="t"><thead><tr><th>Archivo</th><th>¿Va en Git?</th><th>Contenido</th></tr></thead><tbody><tr><td><code>data/df.csv</code></td><td>NO (.gitignore)</td><td>Datos reales — pesado y sensible</td></tr><tr><td><code>data/df.csv.dvc</code></td><td>SÍ</td><td>Hash MD5 + tamaño — puntero ligero</td></tr><tr><td><code>.dvc/cache/</code></td><td>NO</td><td>Copia inmutable del CSV cacheada por DVC</td></tr></tbody></table></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>3</span></div><div class="step-title">Actualizar requirements.txt</div><div class="step-label">requirements.txt</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">txt — requirements.txt</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+imbalanced-learn
+scipy
+pytest
+jupyter
+dvc&gt;=3.0 
+mlflow&gt;=2.0
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+git<span class="w"> </span>add<span class="w"> </span>requirements.txt
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: agregar DVC y MLflow a requirements&quot;</span>
+git<span class="w"> </span>push
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>4</span></div><div class="step-title">Actualizar main.py con tracking MLflow</div><div class="step-label">src/main.py</div></div></div><div class="card-body"><p>Esta es la parte central. El archivo agrega <code>mlflow.start_run()</code>, <code>mlflow.log_params()</code>, <code>mlflow.log_metrics()</code> y <code>mlflow.sklearn.log_model()</code> alrededor del pipeline que ya conocías:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">python — src/main.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">main.py — Pipeline con MLflow tracking.</span>
+<span class="sd">Version 2: agrega registro de experimentos a DVC + MLflow.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow.sklearn</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">cargar_datos</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">limpiar_na_strings</span><span class="p">,</span>
+    <span class="n">winsorizar_columnas</span><span class="p">,</span>
+    <span class="n">imputar_nulos</span><span class="p">,</span>
+    <span class="n">dividir_y_balancear</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">features</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">crear_score_retrasos</span><span class="p">,</span>
+    <span class="n">crear_categorias_edad</span><span class="p">,</span>
+    <span class="n">crear_categorias_dependientes</span><span class="p">,</span>
+    <span class="n">estandarizar_variables</span><span class="p">,</span>
+    <span class="n">seleccionar_features</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">train</span><span class="w"> </span><span class="kn">import</span> <span class="n">comparar_modelos</span><span class="p">,</span> <span class="n">analizar_errores</span>
+
+
+<span class="c1"># ── Parámetros del pipeline (cambian entre versiones) ─────────────────────────</span>
+<span class="n">PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ruta_datos&#39;</span><span class="p">:</span> <span class="s1">&#39;data/df.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="s1">&#39;Default&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;k_features&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="c1"># Cambiar de 15 a 20</span>
+    <span class="s1">&#39;test_size&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> 
+    <span class="s1">&#39;tecnica_balanceo&#39;</span><span class="p">:</span> <span class="s1">&#39;oversampling&#39;</span><span class="p">,</span> <span class="c1"># Cambiar de smote a undersampling</span>
+    <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="s1">&#39;version_pipeline&#39;</span><span class="p">:</span> <span class="s1">&#39;v3-prueba&#39;</span><span class="p">,</span> <span class="c1"># Cambiar de v1-baseline a v2-optimizada</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">configurar_logging</span><span class="p">():</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> | </span><span class="si">%(name)-20s</span><span class="s1"> | </span><span class="si">%(levelname)s</span><span class="s1"> | </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">,</span>
+        <span class="n">handlers</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">),</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s1">&#39;pipeline_crediticio.log&#39;</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">configurar_logging</span><span class="p">()</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="c1"># ── Configurar MLflow ──────────────────────────────────────────────────────</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="s1">&#39;banco-wiesse-crediticio&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;version_pipeline&#39;</span><span class="p">]):</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span><span class="n">PARAMS</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;MLflow run iniciado: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+
+        <span class="c1"># Pipeline de datos</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">cargar_datos</span><span class="p">(</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;ruta_datos&#39;</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">limpiar_na_strings</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">winsorizar_columnas</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">imputar_nulos</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="c1"># Feature engineering</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">crear_score_retrasos</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">crear_categorias_edad</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">crear_categorias_dependientes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">estandarizar_variables</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="c1"># Selección y split</span>
+        <span class="n">excluir</span> <span class="o">=</span> <span class="p">[</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;Edad_cat&#39;</span><span class="p">,</span> <span class="s1">&#39;Deps_cat&#39;</span><span class="p">]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">excluir</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
+
+        <span class="n">top_feats</span> <span class="o">=</span> <span class="n">seleccionar_features</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;k_features&#39;</span><span class="p">])</span>
+        <span class="n">X_sel</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">top_feats</span><span class="p">]</span>
+
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">dividir_y_balancear</span><span class="p">(</span>
+            <span class="n">X_sel</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">test_size</span><span class="o">=</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;test_size&#39;</span><span class="p">],</span>
+            <span class="n">tecnica</span><span class="o">=</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;tecnica_balanceo&#39;</span><span class="p">],</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">PARAMS</span><span class="p">[</span><span class="s1">&#39;random_state&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Entrenar y comparar modelos</span>
+        <span class="n">resultados</span> <span class="o">=</span> <span class="n">comparar_modelos</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+        <span class="n">mejor_nombre</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">resultados</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="n">resultados</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;metricas&#39;</span><span class="p">][</span><span class="s1">&#39;f1&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">mejor_modelo</span> <span class="o">=</span> <span class="n">resultados</span><span class="p">[</span><span class="n">mejor_nombre</span><span class="p">][</span><span class="s1">&#39;modelo&#39;</span><span class="p">]</span>
+        <span class="n">mejor_m</span> <span class="o">=</span> <span class="n">resultados</span><span class="p">[</span><span class="n">mejor_nombre</span><span class="p">][</span><span class="s1">&#39;metricas&#39;</span><span class="p">]</span>
+        <span class="n">errores</span> <span class="o">=</span> <span class="n">analizar_errores</span><span class="p">(</span><span class="n">mejor_modelo</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+        <span class="c1"># Registrar métricas</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">({</span>
+            <span class="s1">&#39;accuracy&#39;</span><span class="p">:</span>        <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;precision&#39;</span><span class="p">:</span>       <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;recall&#39;</span><span class="p">:</span>          <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;recall&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;f1&#39;</span><span class="p">:</span>              <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;roc_auc&#39;</span><span class="p">:</span>         <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;roc_auc&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;false_negatives&#39;</span><span class="p">:</span> <span class="n">errores</span><span class="p">[</span><span class="s1">&#39;FN&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;false_positives&#39;</span><span class="p">:</span> <span class="n">errores</span><span class="p">[</span><span class="s1">&#39;FP&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;costo_estimado&#39;</span><span class="p">:</span>  <span class="n">errores</span><span class="p">[</span><span class="s1">&#39;FN&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10000</span> <span class="o">+</span> <span class="n">errores</span><span class="p">[</span><span class="s1">&#39;FP&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Registrar modelo como artefacto</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">log_model</span><span class="p">(</span>
+            <span class="n">mejor_modelo</span><span class="p">,</span>
+            <span class="n">artifact_path</span><span class="o">=</span><span class="s1">&#39;modelo_crediticio&#39;</span><span class="p">,</span>
+            <span class="n">registered_model_name</span><span class="o">=</span><span class="s1">&#39;DefaultCrediticioWiesse&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Guardar modelo localmente también</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">model_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;models/modelo_</span><span class="si">{</span><span class="n">PARAMS</span><span class="p">[</span><span class="s2">&quot;version_pipeline&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.pkl&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mejor_modelo</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;=== RESULTADO: </span><span class="si">%s</span><span class="s1"> | F1=</span><span class="si">%.4f</span><span class="s1"> | Recall=</span><span class="si">%.4f</span><span class="s1"> | FN=</span><span class="si">%d</span><span class="s1"> ===&#39;</span><span class="p">,</span>
+            <span class="n">mejor_nombre</span><span class="p">,</span>
+            <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">],</span>
+            <span class="n">mejor_m</span><span class="p">[</span><span class="s1">&#39;recall&#39;</span><span class="p">],</span>
+            <span class="n">errores</span><span class="p">[</span><span class="s1">&#39;FN&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div><div class="box box-tech"><strong>Observación técnica:</strong> los comentarios de <code>PARAMS</code> en el código original dicen <em>«Cambiar de 15 a 20»</em> y <em>«Cambiar de smote a undersampling»</em>, pero los valores reales son <code>k_features: 18</code> y <code>tecnica_balanceo: 'oversampling'</code>. Son restos de una edición anterior — el código se ejecuta igual, simplemente ignora el texto de esos comentarios y guíate por los valores reales.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>5</span></div><div class="step-title">Ejecutar y comparar versiones del pipeline</div><div class="step-label">Terminal</div></div></div><div class="card-body"><div class="box box-danger"><strong>Observación técnica:</strong> igual que en el Tema 2, <code>PARAMS['ruta_datos'] = 'data/df.csv'</code> es relativo a la carpeta desde donde ejecutas Python. Ejecuta siempre desde la <strong>raíz</strong> del proyecto apuntando al archivo (no entres a <code>src/</code> primero).</div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+python<span class="w"> </span>src/main.py
+<span class="c1"># 10:15:03 | __main__ | INFO | MLflow run iniciado: abc123def456...</span>
+<span class="c1"># 10:15:05 | __main__ | INFO | === RESULTADO: ... F1=... FN=... ===</span>
+</pre></div><p>Edita <code>PARAMS</code> en <code>src/main.py</code> (por ejemplo <code>version_pipeline</code>, <code>k_features</code> o <code>tecnica_balanceo</code>) y vuelve a ejecutar <code>python src/main.py</code>: MLflow crea un nuevo <em>Run</em> en el mismo <em>Experiment</em> sin perder el anterior.</p><div class="box box-info">En una segunda terminal (también desde la raíz del proyecto):<br><code>mlflow ui --host 0.0.0.0 --port 5000</code><br>Usa <code>--host 0.0.0.0</code> para que Codespaces reenvíe el puerto. Ve a la pestaña <strong>PORTS</strong> y haz clic en el ícono de globo junto al puerto 5000.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>6</span></div><div class="step-title">Comparar runs por código</div><div class="step-label">src/comparar_runs.py</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">python — src/comparar_runs.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="c1"># comparar_runs.py — script de comparación programática</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">experimento</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_experiment_by_name</span><span class="p">(</span><span class="s1">&#39;banco-wiesse-crediticio&#39;</span><span class="p">)</span>
+<span class="n">runs_df</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span>
+    <span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="n">experimento</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">],</span>
+    <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;metrics.recall DESC&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tags.mlflow.runName&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics.recall&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics.f1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;metrics.false_negatives&#39;</span><span class="p">,</span> <span class="s1">&#39;metrics.costo_estimado&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;params.k_features&#39;</span><span class="p">,</span> <span class="s1">&#39;params.tecnica_balanceo&#39;</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;COMPARACIÓN DE RUNS — ordenado por Recall:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">runs_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="n">mejor_run</span> <span class="o">=</span> <span class="n">runs_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">MEJOR RUN: </span><span class="si">{</span><span class="n">mejor_run</span><span class="p">[</span><span class="s2">&quot;tags.mlflow.runName&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Recall : </span><span class="si">{</span><span class="n">mejor_run</span><span class="p">[</span><span class="s2">&quot;metrics.recall&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; F1 : </span><span class="si">{</span><span class="n">mejor_run</span><span class="p">[</span><span class="s2">&quot;metrics.f1&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; FN : </span><span class="si">{</span><span class="n">mejor_run</span><span class="p">[</span><span class="s2">&quot;metrics.false_negatives&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">modelo_produccion</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">sklearn</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span> <span class="sa">f</span><span class="s1">&#39;runs:/</span><span class="si">{</span><span class="n">mejor_run</span><span class="p">[</span><span class="s2">&quot;run_id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">/modelo_crediticio&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Modelo cargado: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">modelo_produccion</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+python<span class="w"> </span>src/comparar_runs.py
+</pre></div><div class="box box-info">Ejecútalo también desde la raíz: MLflow busca la carpeta <code>mlruns/</code> relativa al directorio actual, y esa carpeta se creó junto a <code>data/</code> cuando corriste <code>python src/main.py</code> en el paso anterior.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>7</span></div><div class="step-title">Versionar una nueva versión del dataset con DVC</div><div class="step-label">src/Nuevos_Datos.py</div></div></div><div class="card-body"><p>Simula la llegada de un nuevo batch de datos del banco. DVC detectará el cambio por el hash MD5:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">python — src/Nuevos_Datos.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> 
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/df.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span> 
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">200</span> 
+<span class="n">nuevo</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;ID&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                      <span class="s1">&#39;Default&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Prct_uso_tc&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                      <span class="s1">&#39;Prct_deuda_vs_ingresos&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                      <span class="s1">&#39;Mto_ingreso_mensual&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">8000</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_dependiente&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Edad&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_prestao_retrasados&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_prod_financieros_deuda&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_retraso_60dias&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_creditos_hipotecarios&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+                      <span class="s1">&#39;Nro_retraso_ultm3anios&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="p">})</span> 
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">nuevo</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+
+<span class="n">df2</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;data/df.csv&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> 
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dataset actualizado: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span><span class="si">}</span><span class="s1"> filas&#39;</span><span class="p">)</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+python<span class="w"> </span>src/Nuevos_Datos.py
+<span class="c1"># Dataset actualizado: 2050 filas</span>
+
+dvc<span class="w"> </span>add<span class="w"> </span>data/df.csv
+git<span class="w"> </span>add<span class="w"> </span>data/df.csv.dvc
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;data: actualizar dataset crediticio v2.0 (+200 registros)&quot;</span>
+git<span class="w"> </span>push
+</pre></div><div class="box box-info">Para volver al dataset original y reproducir resultados anteriores: <code>git checkout HEAD~1 -- data/df.csv.dvc && dvc checkout</code>. DVC restaura exactamente el CSV original — reproducibilidad garantizada.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>8</span></div><div class="step-title">Commit final desde el Codespace</div><div class="step-label">Git</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+git<span class="w"> </span>add<span class="w"> </span>src/main.py<span class="w"> </span>src/comparar_runs.py<span class="w"> </span>src/Nuevos_Datos.py<span class="w"> </span>requirements.txt
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: integrar DVC + MLflow tracking al pipeline crediticio&quot;</span>
+git<span class="w"> </span>push
+git<span class="w"> </span>log<span class="w"> </span>--oneline
+</pre></div></div></div><div class="card"><div class="sec-header">Referencia rápida de comandos</div><div class="card-body"><table class="t"><thead><tr><th>Comando</th><th>Para qué sirve</th></tr></thead><tbody><tr><td><code>dvc init</code></td><td>Inicializar DVC en un repositorio Git</td></tr><tr><td><code>dvc add &lt;archivo&gt;</code></td><td>Versionar un archivo con DVC</td></tr><tr><td><code>dvc checkout</code></td><td>Restaurar datos según el .dvc del commit actual</td></tr><tr><td><code>mlflow ui --host 0.0.0.0 --port 5000</code></td><td>Lanzar la UI de MLflow (requerido en Codespaces)</td></tr><tr><td><code>mlflow.set_experiment('nombre')</code></td><td>Crear o activar un Experiment</td></tr><tr><td><code>mlflow.start_run(run_name='v1')</code></td><td>Iniciar un nuevo Run</td></tr><tr><td><code>mlflow.log_params(dict)</code></td><td>Registrar parámetros del experimento</td></tr><tr><td><code>mlflow.log_metrics(dict)</code></td><td>Registrar métricas del experimento</td></tr><tr><td><code>mlflow.sklearn.log_model(modelo)</code></td><td>Registrar modelo como artefacto</td></tr><tr><td><code>mlflow.search_runs(...)</code></td><td>Buscar y comparar runs por código</td></tr></tbody></table></div></div><div class="card"><div class="sec-header">¿Qué aprendiste en este tema?</div><div class="card-body"><div class="learning"><div class="learning-title">1. Versionamiento de datasets con DVC</div><div class="learning-desc">Git no puede versionar archivos grandes. DVC crea punteros .dvc ligeros que SÍ van en Git, mientras el dato real se guarda en storage separado.</div></div><div class="learning"><div class="learning-title">2. Tracking de experimentos con MLflow</div><div class="learning-desc">Cada ejecución del pipeline es un Run dentro de un Experiment. <code>log_params()</code> registra lo que controlas, <code>log_metrics()</code> lo que mides, <code>log_model()</code> el modelo como artefacto.</div></div><div class="learning"><div class="learning-title">3. MLflow UI en GitHub Codespaces</div><div class="learning-desc">Debes lanzar <code>mlflow ui</code> con <code>--host 0.0.0.0</code> para que el entorno reenvíe el puerto 5000, accesible desde la pestaña PORTS.</div></div><div class="learning"><div class="learning-title">4. Comparar versiones de modelo</div><div class="learning-desc">La UI de MLflow permite seleccionar varios runs y compararlos con tablas y gráficos. <code>mlflow.search_runs()</code> lo hace programáticamente.</div></div><div class="learning"><div class="learning-title">5. Reproducibilidad garantizada</div><div class="learning-desc">Con DVC + MLflow + Git, cualquier colaborador puede clonar, hacer <code>dvc checkout</code> y reproducir exactamente cualquier experimento.</div></div><div class="box box-info"><strong>En el Tema 4...</strong> Convertiremos el pipeline en 4 etapas separadas (ingestion, features, entrenamiento, evaluación), cada una con validación de datos, orquestadas por <code>run_pipeline.py</code>.</div></div></div><div class="card"><div class="sec-header">Checklist final</div><div class="card-body"><ul class="checklist"><li>Ejecuté <code>dvc init</code> y comiteé <code>.dvc/</code> + <code>.dvcignore</code>.</li><li>Versioné <code>data/df.csv</code> con <code>dvc add</code> y comiteé el puntero .dvc.</li><li>Actualicé <code>main.py</code> con tracking de MLflow y ejecuté al menos 2 versiones.</li><li>Vi los runs comparados en la UI de MLflow (puerto 5000) y con <code>comparar_runs.py</code>.</li><li>Simulé un nuevo batch de datos y versioné la v2.0 del dataset con DVC.</li><li>Hice commit + push final y lo verifiqué en github.com.</li></ul></div></div>
+
+  <div class="nav-unidades">
+    
+    <a href="unidad02.html"><span class="rot">← Anterior</span>
+      Tema 2 — Ingeniería de Software para Ciencia de Datos</a>
+    
+    
+    <a class="sig" href="unidad04.html"><span class="rot">Siguiente →</span>
+      Tema 4 — Pipelines Reproducibles</a>
+    
+  </div>
+
+  <!-- Pie del documento (igual al PDF) -->
+  <div class="doc-footer">
+    <span>Predicción Default · Versionamiento de Datos y Modelos</span>
+    <span>MLOps con GitHub Codespaces y Google Cloud Platform</span>
+  </div>
+
+</div>
+<script>
+/* funcionalidades.js — v2 (formato de referencia)
+   Botón "Copiar" con ícono SVG y confirmación "Copiado!".
+   Copia solo el código (pre.textContent), sin números ni rótulos. */
+(function () {
+  "use strict";
+  var ICON_COPY = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>';
+  var ICON_OK = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>';
+
+  function initBtn(btn) { btn.innerHTML = ICON_COPY + "Copiar"; }
+  document.querySelectorAll(".copy-btn").forEach(initBtn);
+
+  function confirmar(btn) {
+    btn.classList.add("copied");
+    btn.innerHTML = ICON_OK + "Copiado!";
+    setTimeout(function () { btn.classList.remove("copied"); initBtn(btn); }, 2000);
+  }
+
+  function copiar(texto) {
+    if (navigator.clipboard && window.isSecureContext)
+      return navigator.clipboard.writeText(texto);
+    return new Promise(function (res, rej) {          // respaldo file://
+      var ta = document.createElement("textarea");
+      ta.value = texto; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy") ? res() : rej(); }
+      catch (e) { rej(e); }
+      finally { document.body.removeChild(ta); }
+    });
+  }
+
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest(".copy-btn");
+    if (!btn) return;
+    var pre = btn.closest(".code-wrap").querySelector("pre");
+    if (!pre) return;
+    copiar(pre.textContent.replace(/\n$/, "")).then(
+      function () { confirmar(btn); },
+      function () {
+        btn.textContent = "Error";
+        setTimeout(function () { initBtn(btn); }, 2000);
+      });
+  });
+})();
+
+</script>
+</body>
+</html>

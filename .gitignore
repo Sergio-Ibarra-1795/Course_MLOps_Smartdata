@@ -31,8 +31,8 @@ __pycache__/
 *.log
 
 
-# Ignorar dataset
-/data/Dataset Endeudamiento Crediticio.csv
+# Ignorar dataset en cualquier subcarpeta
+**/Dataset Endeudamiento Crediticio.csv
 
 Class03_Caso_Practico/
 
