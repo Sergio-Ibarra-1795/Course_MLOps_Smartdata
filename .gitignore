@@ -3,3 +3,30 @@
 
 .ipynb_checkpoints/
 
+
+# DVC — Los datasets reales y pesados NO van a Git
+/data/*.csv
+/data/*.parquet
+/data/*.xlsx
+
+# DVC cache y temporales locales (vital para que no subas gigabytes de cache a GitHub)
+.dvc/cache/
+.dvc/tmp/
+
+# MLflow — Historial de experimentos y artefactos locales
+mlruns/
+mlartifacts/
+
+# Modelos serializados (se registrarán a través de MLflow o DVC)
+models/*.pkl
+models/*.joblib
+
+# Python, Jupyter y VS Code (Limpieza de tu entorno de desarrollo)
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+
+# Archivos de logs del sistema
+*.log
+
