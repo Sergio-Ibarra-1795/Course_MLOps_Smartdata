@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<!-- plantilla_unidad.html v3 — HTML con aspecto de documento (igual al PDF) -->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLOPS Caso Práctico 05 — Contenerización con Docker</title>
+<style>
+/* ============================================================
+   estilos.css — Plantilla maestra HTML v3 ("documento")
+   Curso: MLOps con GitHub Codespaces y Google Cloud Platform
+   El HTML replica el aspecto del PDF aprobado: hoja blanca con
+   encabezado/pie de documento, tarjetas con borde fino, código
+   oscuro estilo GitHub y botones Copiar (solo en HTML).
+   ============================================================ */
+:root {
+  --dark: #1A1A2E; --accent: #E94560; --blue: #0F3460;
+  --light-blue: #16213E; --code-bg: #0D1117;
+  --gray: #6C757D; --light-gray: #F8F9FA; --border: #DEE2E6;
+  --warn-bg: #FFF3CD; --warn-border: #E0A800;
+  --info-bg: #E8F4F8; --info-border: #17A2B8;
+  --green-bg: #D4EDDA; --green-border: #28A745;
+  --danger-bg: #F8D7DA; --danger-border: #DC3545;
+  --tech-bg: #FDEBD9; --tech-border: #E8833A;
+  --btn-bg: #21262D; --btn-text: #58A6FF;
+  --code-text: #E6EDF3; --code-cmt: #8B949E;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       background: #DADFE5; color: #212529; line-height: 1.55;
+       padding: 26px 12px 60px; }
+
+/* ---------- Hoja de documento (aspecto del PDF) ---------- */
+.hoja { background: #fff; max-width: 900px; margin: 0 auto;
+        box-shadow: 0 3px 22px rgba(0,0,0,.22); border-radius: 3px;
+        padding: 26px 34px 30px; }
+
+/* Encabezado corrido del documento (igual al PDF) */
+.doc-header { display: flex; justify-content: space-between; align-items: baseline;
+              gap: 10px; flex-wrap: wrap; padding-bottom: 8px; margin-bottom: 18px;
+              border-bottom: 1px solid var(--border); }
+.doc-header .brand { font-weight: 700; font-size: 13px; color: var(--dark); }
+.doc-header .sub { font-size: 12px; color: var(--gray); }
+.doc-header a { font-size: 12px; color: var(--blue); text-decoration: none; }
+.doc-header a:hover { color: var(--accent); }
+
+/* Pie del documento (igual al PDF) */
+.doc-footer { display: flex; justify-content: space-between; gap: 10px;
+              flex-wrap: wrap; margin-top: 22px; padding-top: 8px;
+              border-top: 1px solid var(--border);
+              font-size: 12px; color: var(--gray); }
+
+/* ---------- Portada (idéntica al PDF) ---------- */
+.cover { border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+         margin-bottom: 20px; }
+.cover-accent { height: 6px; background: var(--accent); }
+.cover-body { padding: 26px 30px; }
+.cover-badge { display: inline-block; background: var(--dark); color: #fff;
+               font-size: 11px; font-weight: 700; padding: 6px 16px;
+               border-radius: 6px; letter-spacing: 1px; margin-bottom: 14px; }
+.cover-sub { font-size: 14px; color: var(--blue); margin-bottom: 6px; }
+.cover-title { font-size: 25px; font-weight: 800; color: var(--dark);
+               line-height: 1.28; margin-bottom: 8px; }
+.cover-cs { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.pill { background: var(--dark); border-radius: 8px; padding: 8px 14px;
+        text-align: center; flex: 1; min-width: 128px; }
+.pill-label { font-size: 9px; font-weight: 700; color: #AAAACC;
+              letter-spacing: 1px; text-transform: uppercase; }
+.pill-val { font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px; }
+
+/* ---------- Tarjetas (borde fino, como en el PDF) ---------- */
+.card { border: 1px solid var(--border); border-radius: 9px; overflow: hidden;
+        margin-bottom: 16px; }
+.sec-header { background: var(--blue); color: #fff; padding: 9px 15px;
+              font-weight: 700; font-size: 14px; }
+.card-body { padding: 14px 18px 6px; }
+
+/* Paso */
+.step { background: var(--blue); }
+.step-row { display: flex; align-items: center; }
+.step-badge { background: rgba(0,0,0,0.28); color: #fff; font-weight: 800;
+              font-size: 11px; padding: 9px 15px; text-align: center;
+              min-width: 66px; text-transform: uppercase; line-height: 1.15; }
+.step-badge span { display: block; font-size: 18px; }
+.step-title { color: #fff; font-weight: 700; font-size: 15px; padding: 0 15px; }
+.step-label { margin-left: auto; background: rgba(0,0,0,0.22); color: #E6EDF3;
+              font-size: 10px; padding: 4px 12px; font-family: monospace; }
+
+/* ---------- Código oscuro con botón Copiar ---------- */
+.code-wrap { margin: 9px 0 15px; }
+.code-header { display: flex; align-items: center; justify-content: space-between;
+               background: #161b22; border-radius: 8px 8px 0 0;
+               padding: 6px 12px; border-bottom: 1px solid #30363d; }
+.code-lang { font-size: 11px; color: #8B949E; font-family: monospace; }
+.copy-btn { background: var(--btn-bg); color: var(--btn-text); border: 1px solid #30363d;
+            border-radius: 6px; font-size: 11px; font-weight: 600; padding: 4px 12px;
+            cursor: pointer; transition: all 0.15s; display: flex;
+            align-items: center; gap: 5px; }
+.copy-btn:hover { background: #30363d; border-color: var(--btn-text); }
+.copy-btn.copied { color: #3fb950; border-color: #3fb950; }
+.copy-btn svg { width: 13px; height: 13px; fill: currentColor; }
+pre.codigo { background: var(--code-bg); color: var(--code-text);
+      font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+      font-size: 12.5px; line-height: 1.6; padding: 13px 15px; margin: 0;
+      border-radius: 0 0 8px 8px; overflow-x: auto; white-space: pre; }
+
+/* Resaltado Pygments — tema oscuro GitHub (mismo que el PDF) */
+.codigo .c,.codigo .c1,.codigo .cm,.codigo .ch,.codigo .cs{color:#8B949E;font-style:italic}
+.codigo .k,.codigo .kn,.codigo .kd,.codigo .ow,.codigo .kc{color:#FF7B72}
+.codigo .s,.codigo .s1,.codigo .s2,.codigo .sd,.codigo .sb{color:#A5D6FF}
+.codigo .nf,.codigo .fm{color:#D2A8FF}
+.codigo .nc{color:#F2CC60}
+.codigo .nb,.codigo .bp,.codigo .m,.codigo .mi,.codigo .mf,.codigo .l{color:#79C0FF}
+.codigo .o{color:#FF7B72}
+.codigo .nd{color:#D2A8FF}
+.codigo .nt{color:#7EE787}
+.codigo .gp{color:#8B949E}
+
+/* ---------- Cajas ---------- */
+.box { border-radius: 8px; padding: 11px 15px; margin: 9px 0;
+       font-size: 13.5px; line-height: 1.5; }
+.box-info { background: var(--info-bg); border-left: 4px solid var(--info-border); }
+.box-warn { background: var(--warn-bg); border-left: 4px solid var(--warn-border); }
+.box-success { background: var(--green-bg); border-left: 4px solid var(--green-border); }
+.box-danger { background: var(--danger-bg); border-left: 4px solid var(--danger-border); }
+.box-tech { background: var(--tech-bg); border-left: 4px solid var(--tech-border); }
+
+/* ---------- Tablas ---------- */
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; margin: 9px 0 15px; }
+table.t th { background: var(--blue); color: #fff; padding: 8px 12px;
+             text-align: left; font-size: 12px; }
+table.t td { padding: 7px 12px; border-bottom: 1px solid var(--border);
+             vertical-align: top; }
+table.t tr:nth-child(even) td { background: var(--light-gray); }
+table.t.mod-table th { background: var(--light-blue); }
+table.t code, table.t th code { font-family: monospace; font-size: 12px; }
+
+/* ---------- Objetivos / aprendizajes ---------- */
+.objectives { list-style: none; padding: 0; margin-bottom: 8px; }
+.objectives li { padding: 5px 0 5px 24px; position: relative; font-size: 14px; }
+.objectives li::before { content: '●'; color: var(--accent); position: absolute; left: 0; }
+.learning { margin-bottom: 13px; padding-left: 16px; }
+.learning-title { font-weight: 700; color: var(--blue); font-size: 14px; margin-bottom: 3px; }
+.learning-desc { font-size: 13.5px; color: #444; }
+
+/* ---------- Árbol y checklist ---------- */
+pre.arbol { background: var(--code-bg); color: var(--code-text);
+            font-family: 'Fira Code', Consolas, monospace; font-size: 12px;
+            line-height: 1.55; padding: 13px 15px; border-radius: 8px;
+            overflow-x: auto; margin: 9px 0 15px; white-space: pre; }
+ul.checklist { list-style: none; padding: 0; margin-bottom: 8px; }
+ul.checklist li { padding: 6px 0 6px 28px; position: relative; font-size: 14px; }
+ul.checklist li::before { content: ""; position: absolute; left: 0; top: 9px;
+  width: 15px; height: 15px; border: 2px solid var(--blue); border-radius: 4px; }
+
+p { font-size: 14px; margin-bottom: 10px; }
+code { font-family: monospace; font-size: 12.5px; background: #f1f3f5;
+       padding: 1px 5px; border-radius: 3px; }
+ul, ol { padding-left: 22px; margin-bottom: 10px; font-size: 14px; }
+li { margin: 3px 0; }
+strong { color: var(--dark); }
+
+/* ---------- Navegación entre unidades (dentro de la hoja) ---------- */
+.nav-unidades { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.nav-unidades a { flex: 1; border: 1px solid var(--border); border-radius: 9px;
+  padding: 11px 15px; text-decoration: none; color: var(--dark); font-size: 13px;
+  transition: all .15s; }
+.nav-unidades a:hover { border-color: var(--accent); }
+.nav-unidades .rot { display: block; font-size: 10px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+.nav-unidades .sig { text-align: right; }
+
+/* ---------- Índice general ---------- */
+.grid-unidades { display: grid; grid-template-columns: repeat(auto-fill,minmax(270px,1fr));
+                 gap: 14px; margin: 4px 0 18px; }
+.u-card { border: 1px solid var(--border); border-radius: 9px; padding: 15px;
+          transition: all .15s; }
+.u-card:hover { border-color: var(--accent); }
+.u-num { color: var(--accent); font-weight: 800; font-size: 11px; letter-spacing: 1.5px; }
+.u-card h3 { font-size: 15px; color: var(--dark); margin: 5px 0 6px; }
+.u-card p { font-size: 12.5px; color: var(--gray); }
+.u-card .links a { margin-right: 10px; font-size: 12.5px; font-weight: 700;
+                   color: var(--blue); text-decoration: none; }
+.u-card .links a:hover { color: var(--accent); }
+
+@media (max-width: 640px) {
+  body { padding: 10px 4px 40px; }
+  .hoja { padding: 16px 14px 20px; }
+  .pills { flex-direction: column; }
+  .pill { min-width: unset; }
+  pre.codigo, pre.arbol { font-size: 11px; }
+  .step-title { font-size: 13px; }
+  .cover-title { font-size: 20px; }
+}
+@media print {
+  body { background: #fff; padding: 0; }
+  .hoja { box-shadow: none; max-width: none; }
+  .copy-btn { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="hoja">
+
+  <!-- Encabezado del documento (igual al PDF) -->
+  <div class="doc-header">
+    <span class="brand">CURSO DE MLOPS — Tema 5</span>
+    <span class="sub">Caso Práctico 05 · Riesgo Crediticio · Codespaces</span>
+    <a href="index.html">Índice del curso →</a>
+  </div>
+
+  <!-- Portada -->
+  <div class="cover">
+    <div class="cover-accent"></div>
+    <div class="cover-body">
+      <div class="cover-badge">CURSO DE MLOPS</div>
+      <div class="cover-sub">Tema 5 — Contenerización con Docker</div>
+      <div class="cover-title">Caso Práctico: Servir el Modelo de Riesgo Crediticio como API con Docker + FastAPI</div>
+      <div class="cover-cs">Adaptado para GitHub Codespaces</div>
+      <div class="pills">
+        <div class="pill"><div class="pill-label">Nivel</div><div class="pill-val">Intermedio</div></div>
+        <div class="pill"><div class="pill-label">Proyecto</div><div class="pill-val">Riesgo Crediticio</div></div>
+        <div class="pill"><div class="pill-label">Entorno</div><div class="pill-val">GitHub Codespaces</div></div>
+        <div class="pill"><div class="pill-label">Duración</div><div class="pill-val">90 – 120 min</div></div>
+      </div>
+      <div class="box box-info"><strong>■ Todo el laboratorio se ejecuta desde la terminal integrada del Codespace</strong> (Ctrl+` para abrirla). Docker ya está disponible en el entorno — no necesitas instalar nada en tu máquina local. <strong>Prerrequisito:</strong> <code>artifacts/modelo.pkl</code> debe existir (generado en el Tema 4 con <code>run_pipeline.py</code>).</div>
+    </div>
+  </div>
+
+  <div class="card"><div class="sec-header">¿Qué estamos haciendo y por qué?</div><div class="card-body"><p>El modelo existe como <code>artifacts/modelo.pkl</code>, pero sigue siendo inútil para los sistemas del banco: no hay forma de enviarle datos de un cliente nuevo y recibir una predicción.</p><p>Creamos una <strong>API REST con FastAPI</strong> que expone el modelo como servicio HTTP, la empaquetamos en una <strong>imagen Docker</strong> y la ejecutamos como contenedor. Cualquier sistema del banco puede llamar a <code>POST /predecir</code> y recibir el score de riesgo en menos de 100&nbsp;ms.</p></div></div><div class="card"><div class="sec-header">¿Qué lograrás al final?</div><div class="card-body"><ul class="objectives"><li>Entender qué es Docker y cómo encaja en el ciclo MLOps</li><li>Escribir una API REST con FastAPI que carga y sirve el modelo.pkl</li><li>Crear un Dockerfile que empaqueta la API con todas sus dependencias</li><li>Construir una imagen Docker y correrla como contenedor en el Codespace</li><li>Testear manualmente los endpoints <code>/predecir</code>, <code>/health</code> y <code>/docs</code></li><li>Usar <code>docker compose</code> para levantar API + MLflow en un comando</li></ul></div></div><div class="card"><div class="sec-header">Arquitectura de la solución</div><div class="card-body"><pre class="arbol">Core bancario / App web / Analista / curl / Swagger UI
+       |  HTTP POST /predecir  {&quot;Prct_uso_tc&quot;: 0.85, ...}
+       v
++-----------------------------------------------+
+| Docker Container (puerto 8000 -&gt; reenviado)    |
+|   FastAPI (uvicorn :8000)                      |
+|     POST /predecir   GET /health   GET /docs   |
+|   modelo.pkl (RandomForestClassifier)          |
++-----------------------------------------------+
+       |  {&quot;score_riesgo&quot;:0.82,&quot;decision&quot;:&quot;RECHAZAR&quot;,...}
+       v
+Sistema del banco toma la decisión</pre></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>1</span></div><div class="step-title">Actualizar requirements.txt</div><div class="step-label">Archivo raíz</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">txt — requirements.txt</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"># MLOps Tema 5 — API Docker + FastAPI
+# Pipeline (Temas 1-4)
+pandas&gt;=1.5
+numpy&gt;=1.23
+scikit-learn&gt;=1.2
+imbalanced-learn&gt;=0.10
+matplotlib&gt;=3.6
+dvc&gt;=3.0
+mlflow&gt;=2.0
+scipy&gt;=1.9
+pytest&gt;=7.0
+
+# API — Tema 5
+fastapi&gt;=0.100
+uvicorn[standard]&gt;=0.22
+pydantic&gt;=2.0
+httpx&gt;=0.24
+python-multipart&gt;=0.0.6
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c1"># Verificar que el modelo del Tema 4 existe</span>
+ls<span class="w"> </span>artifacts/modelo.pkl
+<span class="c1"># Si no existe, primero ejecutar: python run_pipeline.py</span>
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>2</span></div><div class="step-title">api/schemas.py — Validación de entrada y salida</div><div class="step-label">api/schemas.py</div></div></div><div class="card-body"><p>Pydantic valida automáticamente tipos y rangos. Si falla, FastAPI devuelve un HTTP 422 antes de que el modelo reciba datos corruptos:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">mkdir<span class="w"> </span>-p<span class="w"> </span>api
+touch<span class="w"> </span>api/__init__.py
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">python — api/schemas.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">api/schemas.py — Modelos Pydantic para validación de entrada y salida.</span>
+<span class="sd">Pydantic valida automáticamente tipos y rangos.</span>
+<span class="sd">Si falla -&gt; HTTP 422 con mensaje claro, el modelo no recibe datos corruptos.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ClienteInput</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Datos de un cliente para predecir probabilidad de default.&quot;&quot;&quot;</span>
+    <span class="n">Prct_uso_tc</span><span class="p">:</span>               <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Porcentaje uso tarjeta crédito&#39;</span><span class="p">)</span>
+    <span class="n">Prct_deuda_vs_ingresos</span><span class="p">:</span>    <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Ratio deuda / ingresos&#39;</span><span class="p">)</span>
+    <span class="n">Mto_ingreso_mensual</span><span class="p">:</span>       <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Ingreso mensual en USD&#39;</span><span class="p">)</span>
+    <span class="n">Nro_dependiente</span><span class="p">:</span>           <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Número de dependientes&#39;</span><span class="p">)</span>
+    <span class="n">Edad</span><span class="p">:</span>                      <span class="nb">int</span>   <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Edad del cliente&#39;</span><span class="p">)</span>
+    <span class="n">Nro_prestao_retrasados</span><span class="p">:</span>    <span class="nb">int</span>   <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Préstamos con retraso &gt;3 meses&#39;</span><span class="p">)</span>
+    <span class="n">Nro_prod_financieros_deuda</span><span class="p">:</span> <span class="nb">int</span>  <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Número de productos de deuda&#39;</span><span class="p">)</span>
+    <span class="n">Nro_retraso_60dias</span><span class="p">:</span>        <span class="nb">int</span>   <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Retrasos &gt;60 días&#39;</span><span class="p">)</span>
+    <span class="n">Nro_creditos_hipotecarios</span><span class="p">:</span> <span class="nb">int</span>   <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Créditos hipotecarios&#39;</span><span class="p">)</span>
+    <span class="n">Nro_retraso_ultm3anios</span><span class="p">:</span>    <span class="nb">int</span>   <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Retrasos últimos 3 años&#39;</span><span class="p">)</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;json_schema_extra&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;example&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;Prct_uso_tc&#39;</span><span class="p">:</span>               <span class="mf">0.85</span><span class="p">,</span>
+        <span class="s1">&#39;Prct_deuda_vs_ingresos&#39;</span><span class="p">:</span>    <span class="mf">0.62</span><span class="p">,</span>
+        <span class="s1">&#39;Mto_ingreso_mensual&#39;</span><span class="p">:</span>       <span class="mf">1800.0</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_dependiente&#39;</span><span class="p">:</span>           <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s1">&#39;Edad&#39;</span><span class="p">:</span>                      <span class="mi">32</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_prestao_retrasados&#39;</span><span class="p">:</span>    <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_prod_financieros_deuda&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_retraso_60dias&#39;</span><span class="p">:</span>        <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_creditos_hipotecarios&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;Nro_retraso_ultm3anios&#39;</span><span class="p">:</span>    <span class="mi">2</span><span class="p">,</span>
+    <span class="p">}}}</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PrediccionOutput</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Respuesta de la API con el resultado de la predicción.&quot;&quot;&quot;</span>
+    <span class="n">score_riesgo</span><span class="p">:</span>          <span class="nb">float</span>                               <span class="c1"># probabilidad de default [0-1]</span>
+    <span class="n">decision</span><span class="p">:</span>              <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;APROBAR&#39;</span><span class="p">,</span> <span class="s1">&#39;REVISAR&#39;</span><span class="p">,</span> <span class="s1">&#39;RECHAZAR&#39;</span><span class="p">]</span>
+    <span class="n">nivel_riesgo</span><span class="p">:</span>          <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;BAJO&#39;</span><span class="p">,</span> <span class="s1">&#39;MODERADO&#39;</span><span class="p">,</span> <span class="s1">&#39;ALTO&#39;</span><span class="p">,</span> <span class="s1">&#39;MUY ALTO&#39;</span><span class="p">]</span>
+    <span class="n">probabilidad_default</span><span class="p">:</span>  <span class="nb">float</span>                               <span class="c1"># mismo que score_riesgo, más descriptivo</span>
+    <span class="n">umbral_usado</span><span class="p">:</span>          <span class="nb">float</span>                               <span class="c1"># UMBRAL_RECHAZAR = 0.60</span>
+    <span class="n">modelo</span><span class="p">:</span>                <span class="nb">str</span>                                 <span class="c1"># tipo de algoritmo usado</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HealthResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Respuesta del endpoint de salud.&quot;&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span>                <span class="nb">str</span>
+    <span class="n">modelo</span><span class="p">:</span>                <span class="nb">str</span>
+    <span class="n">version</span><span class="p">:</span>               <span class="nb">str</span>
+    <span class="n">recall_entrenamiento</span><span class="p">:</span>  <span class="nb">float</span>
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>3</span></div><div class="step-title">api/predictor.py — Carga del modelo y predicción</div><div class="step-label">api/predictor.py</div></div></div><div class="card-body"><p>El modelo se carga <strong>una sola vez</strong> al arrancar la API (evento <em>startup</em>). Las predicciones siguientes no vuelven a leer el disco:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">python — api/predictor.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">api/predictor.py — Carga el modelo.pkl y ejecuta predicciones.</span>
+<span class="sd">El modelo se carga UNA sola vez al arrancar la API (startup event).</span>
+<span class="sd">Las predicciones subsecuentes no vuelven a leer el disco.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Rutas relativas al directorio del proyecto</span>
+<span class="n">MODEL_PATH</span>   <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;artifacts/modelo.pkl&#39;</span><span class="p">)</span>
+<span class="n">METRICS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;artifacts/metrics.json&#39;</span><span class="p">)</span>
+
+<span class="c1"># Umbrales de decisión</span>
+<span class="n">UMBRAL_RECHAZAR</span> <span class="o">=</span> <span class="mf">0.60</span>   <span class="c1"># score &gt;= 0.60 -&gt; RECHAZAR</span>
+<span class="n">UMBRAL_REVISAR</span>  <span class="o">=</span> <span class="mf">0.40</span>   <span class="c1"># score &gt;= 0.40 -&gt; REVISAR</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Predictor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Singleton que encapsula la lógica de predicción.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modelo</span>         <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricas</span>       <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_orden</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">cargar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Carga modelo y metadatos desde disco. Llamar UNA vez en startup.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MODEL_PATH</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Modelo no encontrado: </span><span class="si">{</span><span class="n">MODEL_PATH</span><span class="si">}</span><span class="s1">. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Ejecuta primero: python run_pipeline.py&#39;</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modelo</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">METRICS_PATH</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">METRICS_PATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metricas</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="c1"># Orden de features del entrenamiento</span>
+        <span class="n">features_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;artifacts/features.csv&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">features_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">df_feat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features_path</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">excluir</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_orden</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df_feat</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluir</span><span class="p">]</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Modelo cargado: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelo</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Features en orden: </span><span class="si">%s</span><span class="s1">...&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_orden</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">predecir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recibe dict con los campos del cliente y retorna la predicción.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Modelo no cargado. Llama a cargar() primero.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Calcular features derivadas</span>
+        <span class="n">datos</span><span class="p">[</span><span class="s1">&#39;Score_retrasos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">datos</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Nro_prestao_retrasados&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span>
+            <span class="n">datos</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Nro_retraso_60dias&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>     <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span>
+            <span class="n">datos</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Nro_retraso_ultm3anios&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Construir DataFrame en el orden correcto</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_orden</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span><span class="n">k</span><span class="p">:</span> <span class="n">datos</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_orden</span><span class="p">}])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">datos</span><span class="p">])</span>
+
+        <span class="c1"># Score de riesgo (probabilidad de default)</span>
+        <span class="n">proba</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelo</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Lógica de decisión basada en umbrales</span>
+        <span class="k">if</span> <span class="n">proba</span> <span class="o">&gt;=</span> <span class="n">UMBRAL_RECHAZAR</span><span class="p">:</span>
+            <span class="n">decision</span>     <span class="o">=</span> <span class="s1">&#39;RECHAZAR&#39;</span>
+            <span class="n">nivel_riesgo</span> <span class="o">=</span> <span class="s1">&#39;MUY ALTO&#39;</span> <span class="k">if</span> <span class="n">proba</span> <span class="o">&gt;=</span> <span class="mf">0.80</span> <span class="k">else</span> <span class="s1">&#39;ALTO&#39;</span>
+        <span class="k">elif</span> <span class="n">proba</span> <span class="o">&gt;=</span> <span class="n">UMBRAL_REVISAR</span><span class="p">:</span>
+            <span class="n">decision</span>     <span class="o">=</span> <span class="s1">&#39;REVISAR&#39;</span>
+            <span class="n">nivel_riesgo</span> <span class="o">=</span> <span class="s1">&#39;MODERADO&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">decision</span>     <span class="o">=</span> <span class="s1">&#39;APROBAR&#39;</span>
+            <span class="n">nivel_riesgo</span> <span class="o">=</span> <span class="s1">&#39;BAJO&#39;</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;score_riesgo&#39;</span><span class="p">:</span>         <span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;decision&#39;</span><span class="p">:</span>             <span class="n">decision</span><span class="p">,</span>
+            <span class="s1">&#39;nivel_riesgo&#39;</span><span class="p">:</span>         <span class="n">nivel_riesgo</span><span class="p">,</span>
+            <span class="s1">&#39;probabilidad_default&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;umbral_usado&#39;</span><span class="p">:</span>         <span class="n">UMBRAL_RECHAZAR</span><span class="p">,</span>
+            <span class="s1">&#39;modelo&#39;</span><span class="p">:</span>               <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelo</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">}</span>
+
+
+<span class="c1"># Instancia global — singleton</span>
+<span class="n">predictor</span> <span class="o">=</span> <span class="n">Predictor</span><span class="p">()</span>
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>4</span></div><div class="step-title">api/app.py — Endpoints de la API</div><div class="step-label">api/app.py</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">python — api/app.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">api/app.py — API REST del sistema de predicción de default crediticio.</span>
+
+<span class="sd">Endpoints:</span>
+<span class="sd">    POST /predecir  -&gt; score de riesgo del cliente</span>
+<span class="sd">    GET  /health    -&gt; estado de la API y metadatos del modelo</span>
+<span class="sd">    GET  /          -&gt; info básica</span>
+<span class="sd">    GET  /docs      -&gt; Swagger UI (autogenerado por FastAPI)</span>
+
+<span class="sd">Ejecutar en Codespace:</span>
+<span class="sd">    uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload</span>
+
+<span class="sd">Con Docker:</span>
+<span class="sd">    docker compose up --build</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.middleware.cors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClienteInput</span><span class="p">,</span> <span class="n">PrediccionOutput</span><span class="p">,</span> <span class="n">HealthResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.predictor</span><span class="w"> </span><span class="kn">import</span> <span class="n">predictor</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> | API | </span><span class="si">%(levelname)s</span><span class="s1"> | </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Carga el modelo al arrancar la API (startup event).&quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Cargando modelo de riesgo crediticio...&#39;</span><span class="p">)</span>
+    <span class="n">predictor</span><span class="o">.</span><span class="n">cargar</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;API lista para recibir predicciones&#39;</span><span class="p">)</span>
+    <span class="k">yield</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;API cerrando&#39;</span><span class="p">)</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;API de Riesgo Crediticio — Banco Wiesse&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s1">&#39;Predicción de probabilidad de default crediticio. &#39;</span>
+        <span class="s1">&#39;Modelo entrenado con el pipeline MLOps del proyecto Banco Wiesse.&#39;</span>
+    <span class="p">),</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+    <span class="n">lifespan</span><span class="o">=</span><span class="n">lifespan</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Permitir llamadas desde cualquier origen (CORS)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+    <span class="n">CORSMiddleware</span><span class="p">,</span>
+    <span class="n">allow_origins</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+    <span class="n">allow_methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+    <span class="n">allow_headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Info&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Información básica de la API.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;api&#39;</span><span class="p">:</span>       <span class="s1">&#39;Banco Wiesse — Predicción de Default Crediticio&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span>   <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;docs&#39;</span><span class="p">:</span>      <span class="s1">&#39;/docs&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;health&#39;</span><span class="p">:</span>    <span class="s1">&#39;/health&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;prediccion&#39;</span><span class="p">:</span> <span class="s1">&#39;POST /predecir&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/health&#39;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">HealthResponse</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Salud&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estado de la API y metadatos del modelo en producción.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">predictor</span><span class="o">.</span><span class="n">modelo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s1">&#39;Modelo no cargado&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HealthResponse</span><span class="p">(</span>
+        <span class="n">status</span><span class="o">=</span><span class="s1">&#39;ok&#39;</span><span class="p">,</span>
+        <span class="n">modelo</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">predictor</span><span class="o">.</span><span class="n">modelo</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+        <span class="n">recall_entrenamiento</span><span class="o">=</span><span class="n">predictor</span><span class="o">.</span><span class="n">metricas</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;recall&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">PrediccionOutput</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Prediccion&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predecir</span><span class="p">(</span><span class="n">cliente</span><span class="p">:</span> <span class="n">ClienteInput</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predice la probabilidad de default de un cliente.</span>
+
+<span class="sd">    - **score_riesgo**: probabilidad de default [0.0 - 1.0]</span>
+<span class="sd">    - **decision**: APROBAR | REVISAR | RECHAZAR</span>
+<span class="sd">    - **nivel_riesgo**: BAJO | MODERADO | ALTO | MUY ALTO</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">datos</span>     <span class="o">=</span> <span class="n">cliente</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+        <span class="n">resultado</span> <span class="o">=</span> <span class="n">predictor</span><span class="o">.</span><span class="n">predecir</span><span class="p">(</span><span class="n">datos</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;Predicción: score=</span><span class="si">%.4f</span><span class="s1"> decision=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">resultado</span><span class="p">[</span><span class="s1">&#39;score_riesgo&#39;</span><span class="p">],</span> <span class="n">resultado</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">PrediccionOutput</span><span class="p">(</span><span class="o">**</span><span class="n">resultado</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error en predicción: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div><table class="t"><thead><tr><th>Endpoint</th><th>Método</th><th>Descripción</th></tr></thead><tbody><tr><td><code>/predecir</code></td><td>POST</td><td>Predicción de default para un cliente</td></tr><tr><td><code>/health</code></td><td>GET</td><td>Estado de la API y metadatos del modelo</td></tr><tr><td><code>/docs</code></td><td>GET</td><td>Swagger UI autogenerado por FastAPI</td></tr><tr><td><code>/</code></td><td>GET</td><td>Info básica y links de endpoints</td></tr></tbody></table></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>5</span></div><div class="step-title">Dockerfile — Imagen Docker de la API</div><div class="step-label">Archivo raíz</div></div></div><div class="card-body"><p>Cada instrucción crea una capa cacheada por Docker. Por eso <code>COPY requirements.txt</code> va antes que <code>COPY</code> del código: si solo cambia el código, Docker reutiliza la capa de <code>pip install</code>:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">dockerfile — dockerfile</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="c"># Dockerfile — API de Riesgo Crediticio Banco Wiesse</span>
+
+<span class="c"># ── Imagen base: Python 3.10 slim (liviana, sin herramientas innecesarias) ──</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">python:3.10-slim</span>
+
+<span class="c"># ── Metadatos ────────────────────────────────────────────────────────────────</span>
+<span class="k">LABEL</span><span class="w"> </span><span class="nv">maintainer</span><span class="o">=</span><span class="s2">&quot;MLOps Banco Wiesse&quot;</span>
+<span class="k">LABEL</span><span class="w"> </span><span class="nv">description</span><span class="o">=</span><span class="s2">&quot;API de predicción de default crediticio&quot;</span>
+<span class="k">LABEL</span><span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span>
+
+<span class="c"># ── Variables de entorno ──────────────────────────────────────────────────────</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">PYTHONDONTWRITEBYTECODE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">PYTHONUNBUFFERED</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">PORT</span><span class="o">=</span><span class="m">8000</span>
+
+<span class="c"># ── Directorio de trabajo dentro del contenedor ───────────────────────────────</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="c"># ── Instalar dependencias del sistema (mínimas) ───────────────────────────────</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>--no-install-recommends<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+
+<span class="c"># ── Copiar e instalar dependencias Python ─────────────────────────────────────</span>
+<span class="c"># IMPORTANTE: copiar requirements.txt ANTES del código</span>
+<span class="c"># Así Docker cachea esta capa y no reinstala si solo cambia el código</span>
+<span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c"># ── Copiar el código de la API ────────────────────────────────────────────────</span>
+<span class="k">COPY</span><span class="w"> </span>api/<span class="w"> </span>./api/
+<span class="k">COPY</span><span class="w"> </span>config.py<span class="w"> </span>.
+
+<span class="c"># ── Copiar artefactos del pipeline (modelo + features) ────────────────────────</span>
+<span class="k">COPY</span><span class="w"> </span>artifacts/modelo.pkl<span class="w">   </span>./artifacts/
+<span class="k">COPY</span><span class="w"> </span>artifacts/features.csv<span class="w"> </span>./artifacts/
+<span class="k">COPY</span><span class="w"> </span>artifacts/metrics.json<span class="w"> </span>./artifacts/
+
+<span class="c"># ── Puerto que expone el contenedor ──────────────────────────────────────────</span>
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8000</span>
+
+<span class="c"># ── Health check para que Docker sepa si el contenedor está sano ──────────────</span>
+<span class="k">HEALTHCHECK</span><span class="w"> </span>--interval<span class="o">=</span>30s<span class="w"> </span>--timeout<span class="o">=</span>10s<span class="w"> </span>--retries<span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="k">CMD</span><span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import httpx; httpx.get(&#39;http://localhost:8000/health&#39;)&quot;</span>
+
+<span class="c"># ── Comando de inicio ─────────────────────────────────────────────────────────</span>
+<span class="k">CMD</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;uvicorn&quot;</span>,<span class="w"> </span><span class="s2">&quot;api.app:app&quot;</span>,<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="s2">&quot;--host&quot;</span>,<span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span>,<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="s2">&quot;--port&quot;</span>,<span class="w"> </span><span class="s2">&quot;8000&quot;</span>,<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span><span class="s2">&quot;--workers&quot;</span>,<span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="o">]</span>
+</pre></div><div class="box box-danger"><strong>Observación técnica — importante para poder replicar en casa:</strong> el archivo en el repositorio se llama <code>dockerfile</code> (minúscula), pero <code>docker-compose.yml</code> hace referencia a <code>dockerfile: Dockerfile</code> (con D mayúscula). En Linux — el sistema operativo de GitHub Codespaces — los nombres de archivo distinguen mayúsculas de minúsculas, así que <code>docker compose up --build</code> fallará con <em>«no such file or directory»</em> tal como está. Antes de construir la imagen, renombra el archivo:</div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="c1"># Ejecuta esto una sola vez, antes del PASO 7</span>
+mv<span class="w"> </span>dockerfile<span class="w"> </span>Dockerfile
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">text — .dockerignore</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">__pycache__/ 
+#*.pyc 
+#*.pyo 
+#.git/ 
+#.dvc/ 
+#mlruns/ 
+#notebooks/ 
+#data/ 
+#*.log 
+#*.ipynb 
+.env 
+#artifacts/data_clean.csv 
+#artifacts/X_test.csv 
+#artifacts/y_test.csv 
+#artifacts/reporte_evaluacion.png
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>6</span></div><div class="step-title">docker-compose.yml — Infraestructura completa</div><div class="step-label">Archivo raíz</div></div></div><div class="card-body"><p>Levanta la API + MLflow UI en un solo comando. En Codespaces, ambos puertos (8000 y 5000) se reenvían automáticamente:</p><div class="code-wrap"><div class="code-header"><span class="code-lang">yaml — docker-compose.yml</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="c1"># docker-compose.yml — Levantar API + MLflow en un solo comando</span>
+<span class="c1"># Uso en Codespace: docker compose up --build</span>
+
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.9&#39;</span>
+
+<span class="nt">services</span><span class="p">:</span>
+
+<span class="w">  </span><span class="c1"># ── Servicio 1: API de predicción ─────────────────────────────────────────</span>
+<span class="w">  </span><span class="nt">api</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">      </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Dockerfile</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">banco-wiesse-api</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;8000:8000&#39;</span><span class="w">       </span><span class="c1"># Codespace reenvía este puerto automáticamente</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./artifacts:/app/artifacts</span><span class="w">   </span><span class="c1"># montar artefactos del pipeline</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PIPELINE_VERSION=v1.0.0</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;CMD&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;python&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;-c&#39;</span><span class="p p-Indicator">,</span>
+<span class="w">             </span><span class="s">&#39;import</span><span class="nv"> </span><span class="s">httpx;</span><span class="nv"> </span><span class="s">httpx.get(&quot;http://localhost:8000/health&quot;)&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">banco-wiesse-net</span>
+
+<span class="w">  </span><span class="c1"># ── Servicio 2: MLflow UI (tracking de experimentos) ──────────────────────</span>
+<span class="w">  </span><span class="nt">mlflow</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python:3.10-slim</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">banco-wiesse-mlflow</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">      </span><span class="no">bash -c &#39;pip install mlflow -q &amp;&amp;</span>
+<span class="w">               </span><span class="no">mlflow ui --host 0.0.0.0 --port 5000</span>
+<span class="w">               </span><span class="no">--backend-store-uri file:///mlruns&#39;</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5000:5000&#39;</span><span class="w">       </span><span class="c1"># Codespace reenvía este puerto automáticamente</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./mlruns:/mlruns</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">banco-wiesse-net</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">banco-wiesse-net</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge</span>
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>7</span></div><div class="step-title">Construir la imagen y ejecutar el contenedor</div><div class="step-label">Terminal</div></div></div><div class="card-body"><div class="box box-info">En GitHub Codespaces, Docker ya está disponible en la terminal integrada — no necesitas instalar Docker Desktop.</div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash — Opción A — Docker directo</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+
+<span class="c1"># 1. Construir la imagen (usa el Dockerfile renombrado en el Paso 5)</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>banco-wiesse-api:v1.0<span class="w"> </span>.
+
+<span class="c1"># 2. Ejecutar el contenedor</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>banco-wiesse-api<span class="w"> </span>-p<span class="w"> </span><span class="m">8000</span>:8000<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/artifacts:/app/artifacts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>banco-wiesse-api:v1.0
+
+<span class="c1"># 3. Verificar que está corriendo</span>
+docker<span class="w"> </span>ps
+
+<span class="c1"># 4. Ver los logs de inicio</span>
+docker<span class="w"> </span>logs<span class="w"> </span>banco-wiesse-api
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash — Opción B — Docker Compose (recomendada)</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
+<span class="c1"># Container banco-wiesse-api     Started -&gt; puerto 8000</span>
+<span class="c1"># Container banco-wiesse-mlflow  Started -&gt; puerto 5000</span>
+
+<span class="c1"># Para detener todos los servicios:</span>
+docker<span class="w"> </span>compose<span class="w"> </span>down
+</pre></div><div class="box box-success">■ En Codespaces: ve a la pestaña <strong>PORTS</strong> y haz clic en el globo del puerto 8000 para la API, o del puerto 5000 para MLflow UI.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>8</span></div><div class="step-title">Testing manual del endpoint /predecir</div><div class="step-label">Terminal</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">bash — TEST 1 — Verificar que la API está viva</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">curl<span class="w"> </span>http://localhost:8000/health
+<span class="c1"># {&quot;status&quot;:&quot;ok&quot;,&quot;modelo&quot;:&quot;RandomForestClassifier&quot;,</span>
+<span class="c1">#  &quot;version&quot;:&quot;1.0.0&quot;,&quot;recall_entrenamiento&quot;:0.4923}</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash — TEST 2 — Cliente de ALTO RIESGO</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/predecir<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;Prct_uso_tc&quot;: 0.92, &quot;Prct_deuda_vs_ingresos&quot;: 0.78,</span>
+<span class="s1">    &quot;Mto_ingreso_mensual&quot;: 1200.0, &quot;Nro_dependiente&quot;: 3.0,</span>
+<span class="s1">    &quot;Edad&quot;: 28, &quot;Nro_prestao_retrasados&quot;: 5,</span>
+<span class="s1">    &quot;Nro_prod_financieros_deuda&quot;: 10, &quot;Nro_retraso_60dias&quot;: 3,</span>
+<span class="s1">    &quot;Nro_creditos_hipotecarios&quot;: 0, &quot;Nro_retraso_ultm3anios&quot;: 4</span>
+<span class="s1">  }&#39;</span>
+<span class="c1"># {&quot;score_riesgo&quot;:0.87,&quot;decision&quot;:&quot;RECHAZAR&quot;,&quot;nivel_riesgo&quot;:&quot;MUY ALTO&quot;,...}</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash — TEST 3 — Validación Pydantic (HTTP 422)</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/predecir<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;Prct_uso_tc&quot;: -999}&#39;</span>
+<span class="c1"># HTTP 422 Unprocessable Entity</span>
+</pre></div><div class="box box-info"><strong>Swagger UI automático en /docs:</strong> FastAPI genera una interfaz interactiva en <code>/docs</code>. Abre la URL pública del puerto 8000 y agrega <code>/docs</code> al final.</div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>9</span></div><div class="step-title">tests/test_api.py — Tests automáticos</div><div class="step-label">tests/</div></div></div><div class="card-body"><p>No requiere Docker corriendo — usa el <code>TestClient</code> de FastAPI, que levanta la app en memoria y ejecuta el <code>lifespan</code> (carga el modelo real):</p><div class="code-wrap"><div class="code-header"><span class="code-lang">python — tests/test_api.py</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">tests/test_api.py — Tests del endpoint /predecir con TestClient de FastAPI.</span>
+
+<span class="sd">No requiere Docker corriendo. Usa TestClient que levanta la app en memoria.</span>
+<span class="sd">Ejecutar: pytest tests/test_api.py -v</span>
+
+<span class="sd">NOTA: Se usa el fixture `client` con scope=&quot;session&quot; y context manager</span>
+<span class="sd">para que el lifespan (startup) se ejecute y el modelo se cargue correctamente.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.testclient</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestClient</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">api.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+
+<span class="c1"># ── Fixture ───────────────────────────────────────────────────────────────────</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Levanta la app completa con lifespan (carga el modelo en startup).&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">TestClient</span><span class="p">(</span><span class="n">app</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">c</span>
+
+<span class="c1"># ── Datos de prueba ───────────────────────────────────────────────────────────</span>
+
+<span class="n">CLIENTE_ALTO_RIESGO</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Prct_uso_tc&#39;</span><span class="p">:</span>                <span class="mf">0.92</span><span class="p">,</span>
+    <span class="s1">&#39;Prct_deuda_vs_ingresos&#39;</span><span class="p">:</span>     <span class="mf">0.78</span><span class="p">,</span>
+    <span class="s1">&#39;Mto_ingreso_mensual&#39;</span><span class="p">:</span>        <span class="mf">1200.0</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_dependiente&#39;</span><span class="p">:</span>            <span class="mf">3.0</span><span class="p">,</span>
+    <span class="s1">&#39;Edad&#39;</span><span class="p">:</span>                       <span class="mi">28</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_prestao_retrasados&#39;</span><span class="p">:</span>     <span class="mi">5</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_prod_financieros_deuda&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_retraso_60dias&#39;</span><span class="p">:</span>         <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_creditos_hipotecarios&#39;</span><span class="p">:</span>  <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_retraso_ultm3anios&#39;</span><span class="p">:</span>     <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">CLIENTE_BAJO_RIESGO</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Prct_uso_tc&#39;</span><span class="p">:</span>                <span class="mf">0.15</span><span class="p">,</span>
+    <span class="s1">&#39;Prct_deuda_vs_ingresos&#39;</span><span class="p">:</span>     <span class="mf">0.12</span><span class="p">,</span>
+    <span class="s1">&#39;Mto_ingreso_mensual&#39;</span><span class="p">:</span>        <span class="mf">5500.0</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_dependiente&#39;</span><span class="p">:</span>            <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s1">&#39;Edad&#39;</span><span class="p">:</span>                       <span class="mi">45</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_prestao_retrasados&#39;</span><span class="p">:</span>     <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_prod_financieros_deuda&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_retraso_60dias&#39;</span><span class="p">:</span>         <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_creditos_hipotecarios&#39;</span><span class="p">:</span>  <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;Nro_retraso_ultm3anios&#39;</span><span class="p">:</span>     <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># ── Helpers ───────────────────────────────────────────────────────────────────</span>
+
+<span class="n">DECISIONES_VALIDAS</span>    <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;APROBAR&#39;</span><span class="p">,</span> <span class="s1">&#39;REVISAR&#39;</span><span class="p">,</span> <span class="s1">&#39;RECHAZAR&#39;</span><span class="p">}</span>
+<span class="n">NIVELES_RIESGO_VALIDOS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;BAJO&#39;</span><span class="p">,</span> <span class="s1">&#39;MODERADO&#39;</span><span class="p">,</span> <span class="s1">&#39;ALTO&#39;</span><span class="p">,</span> <span class="s1">&#39;MUY ALTO&#39;</span><span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">assert_respuesta_valida</span><span class="p">(</span><span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Verifica que la estructura y tipos de la respuesta sean correctos.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="s1">&#39;score_riesgo&#39;</span>         <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="s1">&#39;decision&#39;</span>             <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="s1">&#39;nivel_riesgo&#39;</span>         <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="s1">&#39;probabilidad_default&#39;</span> <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="s1">&#39;umbral_usado&#39;</span>         <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="s1">&#39;modelo&#39;</span>               <span class="ow">in</span> <span class="n">body</span>
+    <span class="k">assert</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;score_riesgo&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">1.0</span>
+    <span class="k">assert</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span>    <span class="ow">in</span> <span class="n">DECISIONES_VALIDAS</span>
+    <span class="k">assert</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;nivel_riesgo&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">NIVELES_RIESGO_VALIDOS</span>
+    <span class="c1"># Consistencia interna: score y decision deben ser coherentes</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;score_riesgo&#39;</span><span class="p">]</span>
+    <span class="n">umbral</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;umbral_usado&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">umbral</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RECHAZAR&#39;</span>
+    <span class="k">elif</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">0.40</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REVISAR&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">body</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;APROBAR&#39;</span>
+
+<span class="c1"># ── Tests ─────────────────────────────────────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_health_ok</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;El endpoint /health debe retornar status ok.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/health&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ok&#39;</span>
+    <span class="k">assert</span> <span class="s1">&#39;modelo&#39;</span> <span class="ow">in</span> <span class="n">data</span>
+    <span class="k">assert</span> <span class="s1">&#39;recall_entrenamiento&#39;</span> <span class="ow">in</span> <span class="n">data</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;recall_entrenamiento&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_root_info</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;El endpoint raíz debe retornar info básica de la API.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="s1">&#39;api&#39;</span> <span class="ow">in</span> <span class="n">data</span>
+    <span class="k">assert</span> <span class="s1">&#39;docs&#39;</span> <span class="ow">in</span> <span class="n">data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_predecir_alto_riesgo_estructura</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;POST /predecir debe retornar 200 con estructura correcta.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">CLIENTE_ALTO_RIESGO</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">assert_respuesta_valida</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_predecir_bajo_riesgo_estructura</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;POST /predecir debe retornar 200 con estructura correcta.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">CLIENTE_BAJO_RIESGO</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">assert_respuesta_valida</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_decision_coherente_con_score</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;La decisión debe ser siempre coherente con el score y el umbral.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">payload</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CLIENTE_ALTO_RIESGO</span><span class="p">,</span> <span class="n">CLIENTE_BAJO_RIESGO</span><span class="p">]:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+        <span class="n">assert_respuesta_valida</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_score_es_determinista</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;El mismo cliente debe recibir siempre el mismo score.&quot;&quot;&quot;</span>
+    <span class="n">r1</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">CLIENTE_ALTO_RIESGO</span><span class="p">)</span>
+    <span class="n">r2</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">CLIENTE_ALTO_RIESGO</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r1</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">r2</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">r1</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;score_riesgo&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">r2</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;score_riesgo&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_validacion_campos_invalidos</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Campos inválidos deben retornar HTTP 422 Unprocessable Entity.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Prct_uso_tc&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">999</span><span class="p">})</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_validacion_edad_menor_18</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Edad menor a 18 debe retornar HTTP 422.&quot;&quot;&quot;</span>
+    <span class="n">datos</span> <span class="o">=</span> <span class="n">CLIENTE_BAJO_RIESGO</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">datos</span><span class="p">[</span><span class="s1">&#39;Edad&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">datos</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_validacion_ingreso_negativo</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ingreso mensual negativo debe retornar HTTP 422.&quot;&quot;&quot;</span>
+    <span class="n">datos</span> <span class="o">=</span> <span class="n">CLIENTE_BAJO_RIESGO</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">datos</span><span class="p">[</span><span class="s1">&#39;Mto_ingreso_mensual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">500.0</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/predecir&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">datos</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">422</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_swagger_ui_disponible</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;La documentación Swagger UI debe estar disponible en /docs.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/docs&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_openapi_schema</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;El schema OpenAPI debe estar disponible en /openapi.json.&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/openapi.json&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="s1">&#39;paths&#39;</span> <span class="ow">in</span> <span class="n">schema</span>
+    <span class="k">assert</span> <span class="s1">&#39;/predecir&#39;</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s1">&#39;/health&#39;</span>   <span class="ow">in</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span>
+</pre></div><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+pytest<span class="w"> </span>tests/test_api.py<span class="w"> </span>-v
+</pre></div></div></div><div class="card"><div class="step"><div class="step-row"><div class="step-badge">PASO<span>10</span></div><div class="step-title">Commit final desde el Codespace</div><div class="step-label">Git</div></div></div><div class="card-body"><div class="code-wrap"><div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="void(0)" type="button">Copiar</button></div><pre class="codigo"><span class="nb">cd</span><span class="w"> </span>/workspaces/banco-wiesse-mlops
+git<span class="w"> </span>add<span class="w"> </span>api/<span class="w"> </span>Dockerfile<span class="w"> </span>docker-compose.yml<span class="w"> </span>.dockerignore<span class="w"> </span>tests/<span class="w"> </span>requirements.txt
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: API FastAPI + Docker para servir modelo crediticio&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+git<span class="w"> </span>log<span class="w"> </span>--oneline
+</pre></div></div></div><div class="card"><div class="sec-header">Referencia rápida de comandos Docker</div><div class="card-body"><table class="t"><thead><tr><th>Comando</th><th>Para qué sirve</th></tr></thead><tbody><tr><td><code>docker build -t nombre:tag .</code></td><td>Construir imagen desde el Dockerfile</td></tr><tr><td><code>docker run -d -p 8000:8000 nombre:tag</code></td><td>Ejecutar contenedor en background</td></tr><tr><td><code>docker ps</code></td><td>Ver contenedores en ejecución</td></tr><tr><td><code>docker logs &lt;container&gt;</code></td><td>Ver logs del contenedor</td></tr><tr><td><code>docker compose up --build</code></td><td>Levantar todos los servicios definidos</td></tr><tr><td><code>docker compose down</code></td><td>Detener y eliminar contenedores</td></tr><tr><td><code>pytest tests/test_api.py -v</code></td><td>Ejecutar tests automáticos, sin Docker</td></tr></tbody></table></div></div><div class="card"><div class="sec-header">¿Qué aprendiste en este tema?</div><div class="card-body"><div class="learning"><div class="learning-title">1. Qué es Docker y su rol en MLOps</div><div class="learning-desc">Un contenedor empaqueta el modelo, el código y las dependencias. Garantiza que la API funcione igual en desarrollo, Codespace y en los servidores del banco.</div></div><div class="learning"><div class="learning-title">2. Creación de una imagen con dependencias ML</div><div class="learning-desc">El Dockerfile define la imagen capa por capa. Copiar requirements.txt antes que el código activa el cache de Docker.</div></div><div class="learning"><div class="learning-title">3. FastAPI para servir modelos en producción</div><div class="learning-desc"><code>app.py</code> define los endpoints, <code>schemas.py</code> valida con Pydantic, y el modelo se carga una sola vez en el startup (<code>lifespan</code>).</div></div><div class="learning"><div class="learning-title">4. Testing manual y automático del endpoint</div><div class="learning-desc">curl y Swagger UI para pruebas manuales; TestClient de FastAPI para tests automáticos sin levantar Docker.</div></div><div class="learning"><div class="learning-title">5. Reproducibilidad de la infraestructura</div><div class="learning-desc"><code>docker compose up --build</code> levanta API + MLflow en un solo comando — cualquier persona con acceso al Codespace puede probar la API.</div></div><div class="box box-info"><strong>En el Tema 6...</strong> Optimizaremos hiperparámetros y registraremos el modelo en el Model Registry de MLflow para gestionar versiones en producción.</div></div></div><div class="card"><div class="sec-header">Checklist final</div><div class="card-body"><ul class="checklist"><li>Verifiqué que <code>artifacts/modelo.pkl</code> existe (Tema 4 completado).</li><li>Escribí <code>api/schemas.py</code>, <code>api/predictor.py</code> y <code>api/app.py</code>.</li><li>Renombré <code>dockerfile</code> a <code>Dockerfile</code> antes de construir la imagen.</li><li>Construí la imagen y levanté el contenedor (o usé <code>docker compose up --build</code>).</li><li>Probé <code>/health</code>, <code>/predecir</code> y <code>/docs</code> con curl y el navegador.</li><li><code>pytest tests/test_api.py -v</code> pasa todos los tests.</li><li>Hice commit + push final y lo verifiqué en github.com.</li></ul></div></div>
+
+  <div class="nav-unidades">
+    
+    <a href="unidad04.html"><span class="rot">← Anterior</span>
+      Tema 4 — Pipelines Reproducibles</a>
+    
+    
+    <a class="sig" href="unidad06.html"><span class="rot">Siguiente →</span>
+      Tema 6 — Optimización y Registro de Modelos</a>
+    
+  </div>
+
+  <!-- Pie del documento (igual al PDF) -->
+  <div class="doc-footer">
+    <span>Riesgo Crediticio · Contenerización con Docker</span>
+    <span>MLOps con GitHub Codespaces y Google Cloud Platform</span>
+  </div>
+
+</div>
+<script>
+/* funcionalidades.js — v2 (formato de referencia)
+   Botón "Copiar" con ícono SVG y confirmación "Copiado!".
+   Copia solo el código (pre.textContent), sin números ni rótulos. */
+(function () {
+  "use strict";
+  var ICON_COPY = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>';
+  var ICON_OK = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>';
+
+  function initBtn(btn) { btn.innerHTML = ICON_COPY + "Copiar"; }
+  document.querySelectorAll(".copy-btn").forEach(initBtn);
+
+  function confirmar(btn) {
+    btn.classList.add("copied");
+    btn.innerHTML = ICON_OK + "Copiado!";
+    setTimeout(function () { btn.classList.remove("copied"); initBtn(btn); }, 2000);
+  }
+
+  function copiar(texto) {
+    if (navigator.clipboard && window.isSecureContext)
+      return navigator.clipboard.writeText(texto);
+    return new Promise(function (res, rej) {          // respaldo file://
+      var ta = document.createElement("textarea");
+      ta.value = texto; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy") ? res() : rej(); }
+      catch (e) { rej(e); }
+      finally { document.body.removeChild(ta); }
+    });
+  }
+
+  document.addEventListener("click", function (ev) {
+    var btn = ev.target.closest(".copy-btn");
+    if (!btn) return;
+    var pre = btn.closest(".code-wrap").querySelector("pre");
+    if (!pre) return;
+    copiar(pre.textContent.replace(/\n$/, "")).then(
+      function () { confirmar(btn); },
+      function () {
+        btn.textContent = "Error";
+        setTimeout(function () { initBtn(btn); }, 2000);
+      });
+  });
+})();
+
+</script>
+</body>
+</html>

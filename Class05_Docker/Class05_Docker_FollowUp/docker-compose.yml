@@ -1,0 +1,47 @@
+# docker-compose.yml — Levantar API + MLflow en un solo comando
+# Uso en Codespace: docker compose up --build
+
+version: '3.9'
+
+services:
+
+  # ── Servicio 1: API de predicción ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: banco-wiesse-api
+    ports:
+      - '8000:8000'       # Codespace reenvía este puerto automáticamente
+    volumes:
+      - ./artifacts:/app/artifacts   # montar artefactos del pipeline
+    environment:
+      - PIPELINE_VERSION=v1.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'python', '-c',
+             'import httpx; httpx.get("http://localhost:8000/health")']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - banco-wiesse-net
+
+  # ── Servicio 2: MLflow UI (tracking de experimentos) ──────────────────────
+  mlflow:
+    image: python:3.10-slim
+    container_name: banco-wiesse-mlflow
+    command: >
+      bash -c 'pip install mlflow -q &&
+               mlflow ui --host 0.0.0.0 --port 5000
+               --backend-store-uri file:///mlruns'
+    ports:
+      - '5000:5000'       # Codespace reenvía este puerto automáticamente
+    volumes:
+      - ./mlruns:/mlruns
+    networks:
+      - banco-wiesse-net
+
+networks:
+  banco-wiesse-net:
+    driver: bridge

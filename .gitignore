@@ -37,4 +37,35 @@ __pycache__/
 Class03_Caso_Practico/
 
 
+Class04_CasoPractico/
+
+Class04_FollowUp/data/
+*.csv
+
+
+# Artefactos locales generados por el pipeline o entrenamiento
+artifacts/
+**/artifacts/
+*.pkl
+*.joblib
+
+
+
+# Variables de entorno y credenciales (claves de API, accesos a bases de datos o servicios cloud)
+.env
+.env.*
+!.env.example
+
+# Directorios de pruebas y cobertura locales de Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribución y empaquetado de Python (si llegaras a compilar tu paquete)
+build/
+dist/
+*.egg-info/
+
+
+
 

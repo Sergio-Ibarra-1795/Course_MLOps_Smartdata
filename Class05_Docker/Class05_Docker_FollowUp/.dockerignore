@@ -1,0 +1,15 @@
+__pycache__/ 
+#*.pyc 
+#*.pyo 
+#.git/ 
+#.dvc/ 
+#mlruns/ 
+#notebooks/ 
+#data/ 
+#*.log 
+#*.ipynb 
+vEnv_Course_MLOps_Smartdata 
+#artifacts/data_clean.csv 
+#artifacts/X_test.csv 
+#artifacts/y_test.csv 
+#artifacts/reporte_evaluacion.png
