@@ -51,20 +51,7 @@ artifacts/
 
 
 
-# Variables de entorno y credenciales (claves de API, accesos a bases de datos o servicios cloud)
-.env
-.env.*
-!.env.example
 
-# Directorios de pruebas y cobertura locales de Pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Distribución y empaquetado de Python (si llegaras a compilar tu paquete)
-build/
-dist/
-*.egg-info/
 
 
 
