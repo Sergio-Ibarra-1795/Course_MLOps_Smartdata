@@ -1,0 +1,12 @@
+# requirements_tema6.txt — Dependencias del Tema 6
+# Instalar en el Codespace: pip install -r requirements_tema6.txt
+
+# Base (si no están del Tema 3)
+pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+imbalanced-learn>=0.10
+matplotlib>=3.6
+seaborn>=0.12
+mlflow>=2.0
+scipy>=1.9
