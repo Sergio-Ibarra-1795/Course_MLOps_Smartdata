@@ -1,0 +1,15 @@
+# Base (si no están del Tema 3)
+pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+imbalanced-learn>=0.10
+matplotlib>=3.6
+seaborn>=0.12
+mlflow>=2.0
+scipy>=1.9
+
+
+# CI/CD — testing y linting 
+pytest>=7.0 
+pytest-cov>=4.0 
+flake8>=6.0
