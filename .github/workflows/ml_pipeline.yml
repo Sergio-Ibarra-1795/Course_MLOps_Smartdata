@@ -9,11 +9,16 @@ jobs:
   ejecutar_pipeline_completo:
     runs-on: ubuntu-latest
 
+    # Establece el subdirectorio de trabajo por defecto para TODOS los comandos 'run'
+    defaults:
+      run:
+        working-directory: Class09_MonitoreYMantenimiento/Class09_MonitoreYMantenimiento_FollowUp
+
     steps:
       - name: Checkout del Repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Python
+      - name: Configurar Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -32,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reportes-monitoreo-completo
-          path: reportes/
+          path: Class09_MonitoreYMantenimiento/Class09_MonitoreYMantenimiento_FollowUp/reportes/
