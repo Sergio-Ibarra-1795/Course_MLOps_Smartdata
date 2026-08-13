@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260812_2012",
+  "lote": "wine_2026_Q3",
+  "estado": "CRITICO",
+  "drift_detectado": true,
+  "drift_share": 1.0,
+  "f1_ref": 0.7785,
+  "f1_prod": 0.735,
+  "f1_decay": 0.0559,
+  "alertas": [
+    {
+      "tipo": "DATA_DRIFT_CRITICO",
+      "detalle": "100% features con drift (11.0/11)",
+      "accion": "REENTRENAR modelo con datos nuevos"
+    }
+  ]
+}
